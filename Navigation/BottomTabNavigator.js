@@ -3,11 +3,12 @@ import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import MainPage from "../screens/MainPage/Mainpage";
 import HomeStack from "./HomeStack";
 import {colors} from "../components/common/style/colors";
-import bottomTabHomeSelected from "../assets/img/bottomTabHomeSelected.png"
-
+import {HomeIcon, PubIcon, MyPageIcon, DrinkIcon} from "../components/TabBarIcon";
+import MyPageStack from "./MyPageStack";
 export default function BottomTabNavigator(){
     const BottomTab = createBottomTabNavigator();
     return(
+        
         <BottomTab.Navigator
             initialRouteName="HomeStack"
             screenOptions={{
@@ -23,9 +24,33 @@ export default function BottomTabNavigator(){
                 component={HomeStack}
                 options={({navigation}) => ({
                     tabBarLabel: '홈',
-                    // tabBarIcon: ({focused}) => <Image source={bottomTabHomeSelected}
+                    tabBarIcon: ({focused}) => <HomeIcon focused={focused} />
                 })}
                 />
+            <BottomTab.Screen
+                name="PubStack"
+                component={HomeStack}
+                options={({navigation}) => ({
+                    tabBarLabel: '가게',
+                    tabBarIcon: ({focused}) => <PubIcon focused={focused} />
+                })}
+            />
+            <BottomTab.Screen
+                name="DrinkStack"
+                component={HomeStack}
+                options={({navigation}) => ({
+                    tabBarLabel: '주류추천',
+                    tabBarIcon: ({focused}) => <DrinkIcon focused={focused} />
+                })}
+            />
+            <BottomTab.Screen
+                name="MyPageStack"
+                component={MyPageStack}
+                options={({navigation}) => ({
+                    tabBarLabel: '마이페이지',
+                    tabBarIcon: ({focused}) => <MyPageIcon focused={focused} />
+                })}
+            />
         </BottomTab.Navigator>
     )
 }

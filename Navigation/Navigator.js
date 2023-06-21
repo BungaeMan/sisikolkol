@@ -1,12 +1,13 @@
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
-import {NavigationContainer} from "@react-navigation/native";
+import {NavigationContainer, DefaultTheme} from "@react-navigation/native";
 import LinkingConfiguration from './LinkingConfiguration';
 import BottomTabNavigation from './BottomTabNavigator'
 import BottomTabNavigator from "./BottomTabNavigator";
+import MyPageStack from "./MyPageStack";
 
 export default function Navigation(){
     return (
-        <NavigationContainer linking={LinkingConfiguration} >
+        <NavigationContainer linking={LinkingConfiguration} theme={DefaultTheme}>
             <RootNavigator />
         </NavigationContainer>
         // <View>
