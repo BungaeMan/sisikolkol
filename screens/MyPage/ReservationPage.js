@@ -1,5 +1,5 @@
 import {View, Text, Pressable, Image, useWindowDimensions, ScrollView} from 'react-native';
-import {useNavigation} from "@react-navigation/native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect} from "react";
 import backBtn from "../../assets/img/backBtn.png";
 import whiskeyDetail1 from "../../assets/img/whiskeyDetail1.png";
@@ -8,8 +8,9 @@ import {colors} from "../../components/common/style/colors";
 import trash from "../../assets/img/trash.png"
 import melonAD from "../../assets/img/melonAD.png"
 
-export default function ReservationPage() {
+export default function ReservationPage(props) {
     const navigation = useNavigation();
+    const route = useRoute();
     const windowWidth = useWindowDimensions().width - 36;
     
     useEffect(() => {
@@ -28,39 +29,16 @@ export default function ReservationPage() {
     }, []);
     return (
         <>
-            <View style={{flex:1, backgroundColor:'white'}}>
-                <Text>준비중</Text>
+            <View style={{flex:1, backgroundColor:'white', justifyContent:'center', alignItems:"center"}}>
+                {route.params ? <Text>에약내역이 있습니다.</Text>
+                :
+                    <Text>예약 내역이 없습니다</Text>
+                }
             </View>
         </>
         
     )
 }
 
-const Circle = (props) => {
-    return (
-        <View style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 50,
-            height: 50,
-            borderRadius: 25,
-            backgroundColor: 'white',
-            borderWidth: 1,
-            borderColor: props.color,
-            shadowRadius:5,
-            shadowOpacity:0.1,
-            shadowOffset:{width:0, height:0},
-            elevation:3,
-            shadowColor:"#000"
-        }}>
-            <Text style={{
-                // color:'rgba(71,67,72,0.5)',
-                color:props.color,
-                fontSize:11,
-                fontWeight:500
-            }}>
-                약함
-            </Text>
-        </View>
-    )
+
 }

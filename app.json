@@ -30,7 +30,20 @@
     "extra": {
       "eas": {
         "projectId": "e13df574-016d-4e94-b5c8-372472b4cb13"
+      },
+      "expoConfig": {
+        "android": {
+          "config": {
+            "defaultFontFamily": "Noto-Sans-KR"
+          }
+        },
+        "ios": {
+          "config": {
+            "defaultFontFamily": "Arial"
+          }
+        }
       }
+
     },
     "owner": "lowhigh"
   }

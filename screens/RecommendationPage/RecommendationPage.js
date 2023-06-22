@@ -45,7 +45,7 @@ export default function RecommendationPage() {
                         <Image style={{marginLeft: 'auto'}} source={likeBtn}/>
                     </View>
                     <View style={{marginTop: 24}}>
-                        <Text style={{color: colors.darkGrey, fontSize: 22, fontWeight: 900}}>720,000원</Text>
+                        <Text style={{color: colors.darkGrey, fontSize: 20, fontWeight: 900}}>720,000원</Text>
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
                             <Image source={trash}/>
                             <Text style={{
