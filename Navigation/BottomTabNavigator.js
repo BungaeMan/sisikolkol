@@ -4,7 +4,7 @@ import BarViewPage from "../screens/BarPage/pages/BarViewPage";
 import {colors} from "../components/common/style/colors";
 import {HomeIcon, PubIcon, MyPageIcon, DrinkIcon} from "../components/TabBarIcon";
 import MyPageStack from "./MyPageStack";
-
+import BarStack from "./BarStack";
 
 export default function BottomTabNavigator(){
     const BottomTab = createBottomTabNavigator();
@@ -30,7 +30,7 @@ export default function BottomTabNavigator(){
                 />
             <BottomTab.Screen
                 name="PubStack"
-                component={BarViewPage}
+                component={BarStack}
                 options={({navigation}) => ({
                     tabBarLabel: '가게',
                     tabBarIcon: ({focused}) => <PubIcon focused={focused} />
