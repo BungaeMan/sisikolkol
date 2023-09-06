@@ -21,11 +21,11 @@ export default function MainPage() {
                 <SafeAreaView>
                     {/*<ScrollView style={{height:100}}horizontal={true} showsHorizontalScrollIndicator={false}>*/}
                     <View style={styles.container}>
-                        <Image source={bannerImg} style={{width: windowWidth,}}/>
+                        <Image source={bannerImg} style={{width: "100%"}}/>
                     </View>
                     {/*</ScrollView>*/}
-                    <View style={{width: windowWidth - 36, alignSelf: 'center'}}>
-                        <View style={{marginTop: 28, marginLeft: 12}}>
+                    <View>
+                        <View style={{marginTop: 28, paddingHorizontal: 18}}>
                             <Text style={{color: colors.darkGrey, fontSize: 16, fontWeight: 700}}>예약 현황</Text>
                             <Text style={{opacity: 0.3, fontSize: 10, fontWeight: 400, marginTop: 3}}>예약 정보를
                                 관리해보세요.</Text>
@@ -44,7 +44,7 @@ export default function MainPage() {
                                 backgroundColor: "white",
                                 justifyContent: "center",
                                 alignItems: "center",
-                                width: windowWidth - 36,
+                                marginHorizontal: 18,
                                 height: 120,
                                 shadowColor: "#000",
                                 shadowOffset: {width: 0, height: 0},
@@ -56,7 +56,7 @@ export default function MainPage() {
                             }}>
                             {isReserved ? <Text>예약정보 바로가기</Text>
                                 :
-                            <View>
+                            <View >
                                 <Text style={{fontSize: 10, opacity: 0.5, fontWeight: 500, textAlign: 'center'}}>
                                     예약된 정보가 없습니다.</Text>
                                 <View style={{
@@ -77,17 +77,17 @@ export default function MainPage() {
                             </View>}
                         </Pressable>
                         {/*주류픽!*/}
-                        <View style={{marginTop: 70, marginLeft: 12}}>
+                        <View style={{marginTop: 70, paddingHorizontal: 18}}>
                             <Text style={{color: colors.darkGrey, fontSize: 16, fontWeight: 700}}>오늘의 주류 PICK</Text>
                             <Text style={{opacity: 0.3, fontSize: 10, fontWeight: 400, marginTop: 3}}>다양한 주류를
                                 만나보세요.</Text>
                         </View>
-                        <ScrollView horizontal={true} style={{marginTop: 9}}>
+                        <ScrollView horizontal={true} style={{marginTop: 9}} showsHorizontalScrollIndicator={false}>
                             <Pressable
                                 onPress={() => {
                                     navigation.navigate("Recommendation")
                                 }}
-                                style={{marginRight: 13}}>
+                                style={{paddingHorizontal: 18}}>
                                 <View style={{
                                     width: 180,
                                     height: 130,
@@ -98,7 +98,7 @@ export default function MainPage() {
                                     <Image source={whiskey1}/>
                                 
                                 </View>
-                                <View style={{flexDirection: "row", marginTop: 7, alignItems: 'center'}}>
+                                <View style={{flexDirection: "row", marginTop: 7, alignItems: 'center', }}>
                                     <Text style={{color: colors.darkGrey, fontSize: 12, fontWeight: 400}}>[박근우 픽] 잭 다니엘
                                         99년산</Text>
                                     <View style={{
@@ -112,7 +112,7 @@ export default function MainPage() {
                                         <Text style={{color: "white", fontSize: 9, fontWeight: 700}}>추천</Text>
                                     </View>
                                 </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                <View style={{flexDirection: 'row', alignItems: 'center', }}>
                                     <Image source={star}/>
                                     <Text style={{marginLeft: 3, marginRight: 5, fontSize: 10}}>5.0</Text>
                                     <Text style={{color: colors.mainOrange, fontSize: 10}}>#향 강함 #바디감 약함</Text>

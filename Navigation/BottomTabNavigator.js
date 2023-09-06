@@ -1,10 +1,11 @@
-import {NavigationContainer} from "@react-navigation/native";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import MainPage from "../screens/MainPage/Mainpage";
 import HomeStack from "./HomeStack";
+import BarViewPage from "../screens/BarPage/pages/BarViewPage";
 import {colors} from "../components/common/style/colors";
 import {HomeIcon, PubIcon, MyPageIcon, DrinkIcon} from "../components/TabBarIcon";
 import MyPageStack from "./MyPageStack";
+
+
 export default function BottomTabNavigator(){
     const BottomTab = createBottomTabNavigator();
     return(
@@ -29,7 +30,7 @@ export default function BottomTabNavigator(){
                 />
             <BottomTab.Screen
                 name="PubStack"
-                component={HomeStack}
+                component={BarViewPage}
                 options={({navigation}) => ({
                     tabBarLabel: '가게',
                     tabBarIcon: ({focused}) => <PubIcon focused={focused} />
