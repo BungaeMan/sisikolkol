@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "myapp",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -27,6 +28,14 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "./nmap-plugin",
+        {
+          "clientId": "acumqexl09"
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "e13df574-016d-4e94-b5c8-372472b4cb13"

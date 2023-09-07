@@ -29,7 +29,7 @@ export default function BottomTabNavigator(){
                 })}
                 />
             <BottomTab.Screen
-                name="PubStack"
+                name="BarStack"
                 component={BarStack}
                 options={({navigation}) => ({
                     tabBarLabel: '가게',
