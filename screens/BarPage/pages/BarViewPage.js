@@ -1,16 +1,40 @@
 import {StyleSheet, View} from 'react-native';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
+import {useState} from "react"
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withSpring,
 } from 'react-native-reanimated';
+import NaverMapView, { Marker } from "react-native-nmap"
+
 
 export default function BarViewPage() {
+    const [mapStabled, setMapStabled] = useState(false); // NaverMap generates onCameraChange event when it is first initialized.
     
     
     return (
-        <View style={{flex: 1, backgroundColor: "white"}}>
+        <View style={{flex: 1}}>
+            <NaverMapView
+                style={{flex:1}}
+                showsMyLocationButton={true}
+                useTextureView={true}
+                // onCameraChange={(e) => {
+                //     // console.log("onCameraChange is called:", e.latitude, e.longitude, e.zoom);
+                //     if (mapStabled) {
+                //         setCenterOfMap({
+                //             lat: e.latitude ,
+                //             lng: e.longitude,
+                //         });
+                //         setLevel(e.zoom);
+                //         setButtonShow(true);
+                //         Keyboard.dismiss();
+                //     } else {
+                //         if (e.latitude - centerOfMap.lat < 0.001 && e.longitude - centerOfMap.lng < 0.001 && e.zoom === level)
+                //             setMapStabled(true);
+                //     }
+                // }}
+                />
             <Ball/>
         </View>
     )
@@ -51,6 +75,7 @@ const Ball = () => {
     return (
         <>
             <Animated.View style={[{
+                position:"absolute",
                 width: "100%",
                 height: 1000,
                 backgroundColor: 'blue',
