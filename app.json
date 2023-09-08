@@ -23,7 +23,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.sisikolkol.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -52,7 +53,6 @@
           }
         }
       }
-
     },
     "owner": "lowhigh"
   }
