@@ -1,6 +1,8 @@
 import {StyleSheet, View, Text, ScrollView, useWindowDimensions} from 'react-native';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
 import {useEffect, useState} from "react"
+import {useIsFocused,} from '@react-navigation/native';
+import * as Location from 'expo-location'
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -12,6 +14,46 @@ import NaverMapView, { Marker } from "react-native-nmap"
 
 export default function BarViewPage() {
     const _height = useSharedValue(100);
+    const isFocused = useIsFocused();
+    const [location, setLocation] = useState(null); // 위경도
+    
+    useEffect(()=>{
+        if(!isFocused) return;
+    
+        (async () => {
+            try{
+                let {status} = await Location.requestForegroundPermissionsAsync();
+                if (status !== "granted"){
+                    console.log("Permission to access loaction was denied.");
+                    return
+                }
+                
+                let location = await Location.getLastKnownPositionAsync({});
+                //location을 못불러올 시
+                if(!location){
+                    location = await Location.getCurrentPositionAsync({});
+                }
+                if(location.coords.longitude < 0){
+                    location.coords.longitude = Math.abs(location.coords.longitude);
+                }
+                
+                setLocation({lat: location.coords.latitude, lng: location.coords.longitude});
+                if(33 < location.coords.latitude && location.coords.latitude < 43
+                    && 124< location.coords.longitude && location.coords.longitude < 132){
+                    setLocation({lat: location.coords.latitude, lng: location.coords.longitude});
+                }else {
+                    alert("현재 위치가 한국이 아니므로, 위치를 임의로 정합니다.");
+                    setLocation({lat: 37.5505, lng:126.9255}) //홍대위치
+                }
+                }
+                catch (err){
+                    console.log("Error in expo Location service", err);
+                    setLocation({lat: location.coords.latitude, lng: location.coords.longitude});
+    
+                }
+            }
+        )();
+    },[isFocused])
     
     const viewAnimated = useAnimatedStyle(()=>{
         return{
