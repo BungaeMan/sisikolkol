@@ -8,6 +8,9 @@ export default function BarStack(){
             <Stack.Screen
                 name="BarPage"
                 component={BarViewPage}
+                options={()=>({
+                    headerShown:false
+                })}
                 />
         </Stack.Navigator>
     )
