@@ -12,6 +12,7 @@ import Animated, {
 import NaverMapView, {Marker} from "react-native-nmap"
 import markerPin from "../../../assets/img/marker.png"
 import BarListTemplate from "../templates/BarListTemplate";
+import BarInfoTemplate from "../templates/BarInfoTemplate";
 
 
 //더미 데이터
@@ -38,7 +39,6 @@ export default function BarViewPage() {
     const [clickedCenterId, setClickedCenterId] = useState(null); // 클릭한 시설 아이디
     const [centerOfMap, setCenterOfMap] = useState(null);
     const [mapStabled, setMapStabled] = useState(false); // NaverMap generates onCameraChange event when it is first initialized.
-    
  
     
     const handleClickMarker = (id) => {
@@ -154,7 +154,7 @@ export default function BarViewPage() {
                                     !clickedCenterId ?
                                         <BarListTemplate mapList={mapList} />
                                         :
-                                        <></>
+                                        <BarInfoTemplate />
                                 }
                             </Animated.View>
                         </CenterModal>
