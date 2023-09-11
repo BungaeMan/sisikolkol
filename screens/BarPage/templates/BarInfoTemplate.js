@@ -36,20 +36,24 @@ export default function BarInfoTemplate(){
     });
     
     const renderTabBar = (props) => (
-        <TabBar style={{backgroundColor: "black"}} />
+        <TabBar {...props} style={{backgroundColor: "black"}} />
     )
-    
+    console.log(routes);
     return(
-        <>
+        
             <ScrollView>
-                <TabView navigationState={{index, routes}}
-                         renderScene={renderScene}
-                         renderTabBar={renderTabBar}
-                         onIndexChange={setIndex}
-                         swipeEnabled={false}/>
+                {
+                    routes &&
+                    <TabView navigationState={{index, routes}}
+                             renderScene={renderScene}
+                             renderTabBar={renderTabBar}
+                             onIndexChange={setIndex}
+                             swipeEnabled={false}/>
+                }
+                
             </ScrollView>
             
             
-        </>
+        
     )
 }

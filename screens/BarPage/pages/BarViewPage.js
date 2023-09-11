@@ -166,8 +166,8 @@ export default function BarViewPage() {
 
 const CenterModal = (props) => {
     const isPressed = useSharedValue(false);
-    const offset = useSharedValue({y: 350});
     const layout = useWindowDimensions();
+    const offset = useSharedValue({y: layout.height * 0.5});
     const animatedStyles = useAnimatedStyle(() => {
         return {
             transform: [
