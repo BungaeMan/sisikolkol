@@ -3416,10 +3416,10 @@ expo-linking@^4.0.1:
     qs "^6.11.0"
     url-parse "^1.5.9"
 
-expo-location@^16.1.0:
-  version "16.1.0"
-  resolved "https://registry.yarnpkg.com/expo-location/-/expo-location-16.1.0.tgz#251a465790d6622f828fd18f0edb2a73b9664b72"
-  integrity sha512-/jfRyYrXb9vjr8HoYmVHnzEqnw+0jaoRbHsxj6ePPAbevXmvXZqYHFRtfZtQ+q32SB4X6kUAXu28eBcLS+tqaA==
+expo-location@~15.1.1:
+  version "15.1.1"
+  resolved "https://registry.yarnpkg.com/expo-location/-/expo-location-15.1.1.tgz#9289ca687afbdb73d847cc8c821ab66746eb9d47"
+  integrity sha512-hoKRlmi6Ya+NeZ72Zt385SDcSsIDpJI60TCBVO+Hc9xfKA9Hyminyyo5WiwI8J03igmPTCl8Y37MxBNKY9AWkg==
 
 expo-manifests@~0.5.0:
   version "0.5.2"
@@ -5950,10 +5950,10 @@ react-native-modal@^13.0.1:
   version "0.0.66"
   resolved "git+https://github.com/dbwjd887/react-native-nmap.git#6b59040d3c768c09f1f8cb0d38ef2d28be18cd50"
 
-react-native-pager-view@^6.2.1:
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.2.1.tgz#985d21bbb7d7bc012f4c142dedbb98ce4bdea104"
-  integrity sha512-fZ8chez5J+w831nSnbtK8hwlCiMy1DgpFv8xG6ajXLsAI8uMkGvP554QDIDNlUoCuVwMf7OFyd32Y2Nm2Iaj9Q==
+react-native-pager-view@6.1.2:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.1.2.tgz#3522079b9a9d6634ca5e8d153bc0b4d660254552"
+  integrity sha512-qs2KSFc+7N7B+UZ6SG2sTvCkppagm5fVyRclv1KFKc7lDtrhXLzN59tXJw575LDP/dRJoXsNwqUAhZJdws6ABQ==
 
 react-native-popup-menu@^0.16.1:
   version "0.16.1"
