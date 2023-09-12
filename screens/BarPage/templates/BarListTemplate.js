@@ -1,8 +1,9 @@
 import {Image, Pressable, ScrollView, Text, View} from "react-native";
 import barImg from "../../../assets/img/barImgSample.png";
+import barBanner from "../../../assets/img/sampleBar.png"
 
 
-export default function BarListTemplate({mapList}) {
+export default function BarListTemplate({mapList, setClickedCenterId}) {
     
     
     return (
@@ -16,7 +17,9 @@ export default function BarListTemplate({mapList}) {
                         justifyContent: 'center',
                         alignItems: "center",
                         borderBottomWidth: 3, borderBottomStyle: 'solid', borderBottomColor: '#F8F8F8',
-                    })}>
+                    })}
+                               onPress={() => setClickedCenterId(item.id)}
+                    >
                         <View style={{
                             width: "100%",
                             paddingVertical: 12,
@@ -30,7 +33,7 @@ export default function BarListTemplate({mapList}) {
                                 height: 72,
                                 borderRadius: 10
                             }}
-                                   source={barImg}/>
+                                   source={barBanner}/>
                             <View style={{
                                 paddingLeft: 12,
                                 justifyContent: "center"

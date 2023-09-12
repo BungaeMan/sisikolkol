@@ -18,10 +18,11 @@ import BarInfoTemplate from "../templates/BarInfoTemplate";
 //더미 데이터
 const mapList = [{
     id: 1,
+    name:"홍대 바 본점",
     latitude: 37.5505,
     longitude: 126.9255,
     address: "서울특별시 마포구 와우산로 94",
-    name:"홍대 바 본점"
+    ratings: 4.5
 }];
 
 const markerSize = {
@@ -152,9 +153,11 @@ export default function BarViewPage() {
                             <Animated.View style={viewAnimated}>
                                 {
                                     !clickedCenterId ?
-                                        <BarListTemplate mapList={mapList} />
+                                        <BarListTemplate mapList={mapList} setClickedCenterId={setClickedCenterId}/>
                                         :
-                                        <BarInfoTemplate />
+                                        <BarInfoTemplate mapList={mapList}
+                                                         clickedCenterId={clickedCenterId}
+                                        />
                                 }
                             </Animated.View>
                         </CenterModal>

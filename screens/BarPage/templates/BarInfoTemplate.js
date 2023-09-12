@@ -1,26 +1,28 @@
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {useState} from "react";
-import {View, Text, ScrollView} from "react-native";
+import {View, Text, ScrollView, Image} from "react-native";
+import {colors} from "../../../components/common/style/colors";
+import ratingStar from "../../../assets/img/ratingStar.png"
+import BarInfoOrganism from "../organisms/BarInfoOrganism";
+import ReservationOrganism from "../organisms/ReservationOrganism";
+import barBanner from "../../../assets/img/sampleBar.png"
 
 
-export default function BarInfoTemplate(){
+export default function BarInfoTemplate({mapList, clickedCenterId}) {
     const [routes] = useState([
         {key: "first", title: "가게정보"},
-        {key: "second", title: "예약" },
+        {key: "second", title: "예약"},
         {key: "third", title: "리뷰"}
     ]);
     const [index, setIndex] = useState(0);
+    const [centerInfo] = useState(mapList.find(e => e.id === clickedCenterId));
     
     const FirstRoute = () => (
-        <View >
-            <Text>ddd</Text>
-        </View>
+        <BarInfoOrganism info={centerInfo}/>
     )
     
     const SecondRoute = () => (
-        <View>
-            <Text>2222</Text>
-        </View>
+        <ReservationOrganism />
     )
     
     const ThirdRoute = () => (
@@ -36,24 +38,64 @@ export default function BarInfoTemplate(){
     });
     
     const renderTabBar = (props) => (
-        <TabBar {...props} style={{backgroundColor: "black"}} />
+        <TabBar {...props}
+                style={{
+                    backgroundColor: 'white',
+                    shadowColor: 'white',
+                    marginHorizontal: 10,
+                    marginBottom: 10,
+                    elevation: 0
+                }}
+                indicatorStyle={{backgroundColor: colors.mainOrange}}
+        
+                tabStyle={{width: 'auto', height: 40}}
+                renderLabel={({route, focused}) => (
+                    <Text style={{opacity: focused ? 1 : 0.3, fontWeight: 'bold'}}>
+                        {route.title}
+                    </Text>
+                )}
+        
+        />
     )
     console.log(routes);
-    return(
+    return (
         
-            <ScrollView>
-                {
-                    routes &&
-                    <TabView navigationState={{index, routes}}
-                             renderScene={renderScene}
-                             renderTabBar={renderTabBar}
-                             onIndexChange={setIndex}
-                             swipeEnabled={false}/>
-                }
-                
-            </ScrollView>
-            
-            
+        <ScrollView style={{width:"100%", height:"100%"}}>
+            <View style={{alignItems: "center"}}>
+                <Image
+                    source={barBanner}
+                    style={{
+                    width: "100%",
+                    height: 160,
+                    marginBottom: 11
+                }}
+                />
+                <Text style={{
+                    color: colors.mainOrange,
+                    fontWeight: "700",
+                    fontSize: 12
+                }}>영업중</Text>
+                <Text style={{
+                    fontSize: 18,
+                    fontWeight: "500",
+                    marginVertical: 2
+                }}>{centerInfo.name}</Text>
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <Image source={ratingStar} style={{marginRight: 4}}/>
+                    <Text>{centerInfo.ratings}</Text>
+                </View>
+            </View>
+            <TabView style={{height: 800}}
+                     navigationState={{index, routes}}
+                     renderScene={renderScene}
+                     renderTabBar={renderTabBar}
+                     onIndexChange={setIndex}
+                     swipeEnabled={false}
+            />
         
+        
+        </ScrollView>
+    
+    
     )
 }

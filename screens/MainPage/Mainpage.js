@@ -32,13 +32,7 @@ export default function MainPage() {
                         </View>
                         <Pressable
                             onPress={() => {
-                                // navigation.navigate("Reservation")
-                                if(!isReserved){
-                                setIsModalOpen(true);
-                                }
-                                else {
-                                    navigation.navigate("Reservation",  {reserved: 'isReserved' })
-                                }
+                                    navigation.navigate("BarStack");
                             }}
                             style={{
                                 backgroundColor: "white",
