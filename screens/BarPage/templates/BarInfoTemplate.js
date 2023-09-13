@@ -22,12 +22,11 @@ export default function BarInfoTemplate({mapList, clickedCenterId}) {
     )
     
     const SecondRoute = () => (
-        <ReservationOrganism />
+        <ReservationOrganism info={centerInfo}/>
     )
     
     const ThirdRoute = () => (
         <View>
-            <Text>3333</Text>
         </View>
     )
     

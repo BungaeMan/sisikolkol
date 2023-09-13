@@ -8,12 +8,16 @@ import whiskey1 from "../../assets/img/whiskey1.png";
 import star from "../../assets/img/mainPageStar.png"
 import {useNavigation} from "@react-navigation/native";
 import ReservationModal from "../BarPage/ReservationModal";
+import {useRecoilState} from "recoil";
+import {ReservationStatus} from "../../components/recoil/reservation";
+import barBanner from "../../assets/img/sampleBar.png"
 
 export default function MainPage() {
     const windowWidth = useWindowDimensions().width;
     const navigation = useNavigation();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isReserved, setIsReserved ] = useState(false);
+    const [isReserved, setIsReserved] = useState(false);
+    const [status, setStatus] = useRecoilState(ReservationStatus);
     
     return (
         <>
@@ -30,10 +34,7 @@ export default function MainPage() {
                             <Text style={{opacity: 0.3, fontSize: 10, fontWeight: 400, marginTop: 3}}>예약 정보를
                                 관리해보세요.</Text>
                         </View>
-                        <Pressable
-                            onPress={() => {
-                                    navigation.navigate("BarStack");
-                            }}
+                        <View
                             style={{
                                 backgroundColor: "white",
                                 justifyContent: "center",
@@ -48,28 +49,49 @@ export default function MainPage() {
                                 borderRadius: 10,
                                 marginTop: 10
                             }}>
-                            {isReserved ? <Text>예약정보 바로가기</Text>
+                            {status.id ?
+                                <Pressable style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    width: "100%",
+                                    padding: 15
+                                }}
+                                           onPress={() => {
+                                               setIsModalOpen(true);
+                                           }}
+                                >
+                                    <View style={{marginLeft: 10}}>
+                                        <Text style={{
+                                            color: colors.darkGrey,
+                                            fontSize: 18,
+                                            fontWeight: "700"
+                                        }}>{status.time} 예약</Text>
+                                        <Text style={{opacity: 0.5, marginTop: 2}}>{status.name}</Text>
+                                    </View>
+                                    <Image style={{width: 90, height: 90, borderRadius: 10}} source={barBanner}/>
+                                </Pressable>
                                 :
-                            <View >
-                                <Text style={{fontSize: 10, opacity: 0.5, fontWeight: 500, textAlign: 'center'}}>
-                                    예약된 정보가 없습니다.</Text>
-                                <View style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginTop: 4,
-                                }}>
-                                    <Image source={plusBtn}/>
-                                    <Text style={{
-                                        textAlign: 'center',
-                                        color: colors.mainOrange,
-                                        marginLeft: 5,
-                                        fontSize: 14,
-                                        fontWeight: 500
-                                    }}>예약하기</Text>
-                                </View>
-                            </View>}
-                        </Pressable>
+                                <View>
+                                    <Text style={{fontSize: 10, opacity: 0.5, fontWeight: 500, textAlign: 'center'}}>
+                                        예약된 정보가 없습니다.</Text>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginTop: 4,
+                                    }}>
+                                        <Image source={plusBtn}/>
+                                        <Text style={{
+                                            textAlign: 'center',
+                                            color: colors.mainOrange,
+                                            marginLeft: 5,
+                                            fontSize: 14,
+                                            fontWeight: 500
+                                        }}>예약하기</Text>
+                                    </View>
+                                </View>}
+                        </View>
                         {/*주류픽!*/}
                         <View style={{marginTop: 70, paddingHorizontal: 18}}>
                             <Text style={{color: colors.darkGrey, fontSize: 16, fontWeight: 700}}>오늘의 주류 PICK</Text>
@@ -92,7 +114,7 @@ export default function MainPage() {
                                     <Image source={whiskey1}/>
                                 
                                 </View>
-                                <View style={{flexDirection: "row", marginTop: 7, alignItems: 'center', }}>
+                                <View style={{flexDirection: "row", marginTop: 7, alignItems: 'center',}}>
                                     <Text style={{color: colors.darkGrey, fontSize: 12, fontWeight: 400}}>[박근우 픽] 잭 다니엘
                                         99년산</Text>
                                     <View style={{
@@ -106,7 +128,7 @@ export default function MainPage() {
                                         <Text style={{color: "white", fontSize: 9, fontWeight: 700}}>추천</Text>
                                     </View>
                                 </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center', }}>
+                                <View style={{flexDirection: 'row', alignItems: 'center',}}>
                                     <Image source={star}/>
                                     <Text style={{marginLeft: 3, marginRight: 5, fontSize: 10}}>5.0</Text>
                                     <Text style={{color: colors.mainOrange, fontSize: 10}}>#향 강함 #바디감 약함</Text>
@@ -164,7 +186,8 @@ export default function MainPage() {
                 
                 </SafeAreaView>
             </ScrollView>
-            <ReservationModal open={isModalOpen} setOpen={setIsModalOpen} width={windowWidth} setReserved={setIsReserved}/>
+            <ReservationModal open={isModalOpen} setOpen={setIsModalOpen} width={windowWidth}
+                              setReserved={setIsReserved} status={status} setStatus={setStatus}/>
         </>
     )
 }

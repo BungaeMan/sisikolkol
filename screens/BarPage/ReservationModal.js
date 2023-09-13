@@ -1,8 +1,9 @@
 import Modal from "react-native-modal";
-import {View, Text, Pressable} from "react-native";
+import {View, Text, Pressable, Alert} from "react-native";
 import {colors} from "../../components/common/style/colors";
 
 const ReservationModal = (props) => {
+    
     
     return (
         <Modal isVisible={props.open} style={{alignItems: 'center'}}
@@ -23,9 +24,8 @@ const ReservationModal = (props) => {
                     opacity: pressed ? 0.5 : 1
                 })}
                            onPress={()=>{
-                               
-                               props.setReserved(true);
-                               alert('예약되었습니다');
+                               props.setStatus({id: null});
+                               Alert.alert("예약이 취소되었습니다.")
                                props.setOpen(false);
                            }}
                 
@@ -39,7 +39,7 @@ const ReservationModal = (props) => {
                         borderRadius: 10,
                         
                     }}>
-                        <Text style={{color:'white', fontWeight:700, fontSize:16 }}>예약</Text>
+                        <Text style={{color:'white', fontWeight:700, fontSize:16 }}>예약취소</Text>
                     </View>
                 </Pressable>
             </View>

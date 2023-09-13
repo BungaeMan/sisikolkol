@@ -10,14 +10,17 @@ import moment from "moment";
 import nextArrow from "../../../assets/img/nextCalenderArrow.png"
 import backArrow from "../../../assets/img/backCalenderArrow.png"
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Alert} from "react-native";
+import {ReservationStatus} from "../../../components/recoil/reservation";
+import {useRecoilState} from "recoil";
 
 
-
-export default function ReservationOrganism() {
+export default function ReservationOrganism({info}) {
     const [openCalender, setOpenCalender] = useState(false);
     const [openClock, setOpenClock] = useState(false);
     const [selectedDay, setSelectedDay] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
+    const [status, setStatus] = useRecoilState(ReservationStatus);
     
     //선택 날짜 변화 계산
     const onDateChange = (date) => {
@@ -31,6 +34,8 @@ export default function ReservationOrganism() {
         console.log(dayOfWeek);
         setSelectedDay(`${tmp2[0]}월 ${tmp2[1]}일 ${dayOfWeek}요일`);
     }
+    
+    console.log(status);
     
     const TimeBtn = (props) => {
         
@@ -138,6 +143,20 @@ export default function ReservationOrganism() {
                 opacity: pressed ? 0.5 : 1,
                 marginTop: 50
             })}
+                       onPress={async ()=>{
+                           if(selectedTime && selectedDay){
+                               setStatus({
+                                   ...info,
+                                   date: selectedDay,
+                                   time: selectedTime
+                               })
+                               Alert.alert("예약되었습니다.")
+                           }
+                           else{
+                               Alert.alert("날짜 및 시간을 선택해주세요.")
+                           }
+                           
+                       }}
             >
                 <View style={{
                     width: "100%",
