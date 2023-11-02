@@ -1,5 +1,5 @@
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
-import ReservationPage from "../screens/MyPage/ReservationPage"
+import ReservationPage from "../screens/MyPage/pages/ReservationPage"
 import {Pressable} from "react-native";
 import CommonMyPage from "../screens/MyPage/pages/CommonMyPage";
 

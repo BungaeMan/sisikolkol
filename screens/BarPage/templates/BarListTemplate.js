@@ -12,7 +12,8 @@ export default function BarListTemplate({mapList, setClickedCenterId}) {
                 mapList &&
                 mapList.map((item) => (
                     
-                    <Pressable style={({pressed}) => ({
+                    <Pressable key={item.id}
+                        style={({pressed}) => ({
                         opacity: pressed ? 0.5 : 1,
                         justifyContent: 'center',
                         alignItems: "center",

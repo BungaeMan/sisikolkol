@@ -56,7 +56,6 @@ export default function BarInfoTemplate({mapList, clickedCenterId}) {
         
         />
     )
-    console.log(routes);
     return (
         
         <ScrollView style={{width:"100%", height:"100%"}}>

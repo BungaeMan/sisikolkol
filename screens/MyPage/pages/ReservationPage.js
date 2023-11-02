@@ -1,12 +1,12 @@
 import {View, Text, Pressable, Image, useWindowDimensions, ScrollView} from 'react-native';
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect} from "react";
-import backBtn from "../../assets/img/backBtn.png";
-import whiskeyDetail1 from "../../assets/img/whiskeyDetail1.png";
-import likeBtn from "../../assets/img/likeBtn.png";
-import {colors} from "../../components/common/style/colors";
-import trash from "../../assets/img/trash.png"
-import melonAD from "../../assets/img/melonAD.png"
+import backBtn from "../../../assets/img/backBtn.png";
+import whiskeyDetail1 from "../../../assets/img/whiskeyDetail1.png";
+import likeBtn from "../../../assets/img/likeBtn.png";
+import {colors} from "../../../components/common/style/colors";
+import trash from "../../../assets/img/trash.png"
+import melonAD from "../../../assets/img/melonAD.png"
 
 export default function ReservationPage(props) {
     const navigation = useNavigation();

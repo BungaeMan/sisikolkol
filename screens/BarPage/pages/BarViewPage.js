@@ -13,17 +13,18 @@ import NaverMapView, {Marker} from "react-native-nmap"
 import markerPin from "../../../assets/img/marker.png"
 import BarListTemplate from "../templates/BarListTemplate";
 import BarInfoTemplate from "../templates/BarInfoTemplate";
+import axios from "axios";
 
 
 //더미 데이터
-const mapList = [{
-    id: 1,
-    name:"홍대 바 본점",
-    latitude: 37.5505,
-    longitude: 126.9255,
-    address: "서울특별시 마포구 와우산로 94",
-    ratings: 4.5
-}];
+// const mapList = [{
+//     id: 1,
+//     name:"홍대 바 본점",
+//     latitude: 37.5505,
+//     longitude: 126.9255,
+//     address: "서울특별시 마포구 와우산로 94",
+//     ratings: 4.5
+// }];
 
 const markerSize = {
     width: 21,
@@ -40,11 +41,12 @@ export default function BarViewPage() {
     const [clickedCenterId, setClickedCenterId] = useState(null); // 클릭한 시설 아이디
     const [centerOfMap, setCenterOfMap] = useState(null);
     const [mapStabled, setMapStabled] = useState(false); // NaverMap generates onCameraChange event when it is first initialized.
- 
+    const [mapList, setMapList] = useState(null);
+    
     
     const handleClickMarker = (id) => {
         const marker = mapList.find(e => e.id === id);
-        
+        console.log(marker)
         if (id === clickedCenterId) {
             setClickedCenterId(null);
         } else {
@@ -52,6 +54,14 @@ export default function BarViewPage() {
             setCenterOfMap({lat: marker.latitude, lng: marker.longitude});
         }
     }
+    
+    const viewAnimated = useAnimatedStyle(() => {
+        return {
+            height: withTiming(_height.value, {
+                delay: 0
+            })
+        }
+    })
     
     useEffect(() => {
         if (!isFocused) return;
@@ -90,18 +100,13 @@ export default function BarViewPage() {
                 
             }
         )();
-    }, [isFocused])
+    }, [isFocused]);
     
-    const viewAnimated = useAnimatedStyle(() => {
-        return {
-            height: withTiming(_height.value, {
-                delay: 0
-            })
-        }
-    })
+    useEffect(()=> {
+        axios.get(`http://localhost:8080/coordinate`).then(res => setMapList(res.data));
+    }, []);
     
-    console.log(mapList);
-    console.log(clickedCenterId);
+   
     return (
         <>
             {
@@ -122,6 +127,7 @@ export default function BarViewPage() {
                             }
                             onCameraChange={(e) => {
                                 // console.log("onCameraChange is called:", e.latitude, e.longitude, e.zoom);
+                                
                                 if (mapStabled) {
                                     setCenterOfMap({
                                         lat: e.latitude,

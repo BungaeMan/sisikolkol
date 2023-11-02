@@ -5,6 +5,8 @@ import {colors} from "../components/common/style/colors";
 import {HomeIcon, PubIcon, MyPageIcon, DrinkIcon} from "../components/TabBarIcon";
 import MyPageStack from "./MyPageStack";
 import BarStack from "./BarStack";
+import RecommendationStack from "./RecommendationStack";
+
 
 export default function BottomTabNavigator(){
     const BottomTab = createBottomTabNavigator();
@@ -37,8 +39,8 @@ export default function BottomTabNavigator(){
                 })}
             />
             <BottomTab.Screen
-                name="DrinkStack"
-                component={HomeStack}
+                name="RecommendationStack"
+                component={RecommendationStack}
                 options={({navigation}) => ({
                     tabBarLabel: '주류추천',
                     tabBarIcon: ({focused}) => <DrinkIcon focused={focused} />

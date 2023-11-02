@@ -11,13 +11,14 @@ import ReservationModal from "../BarPage/ReservationModal";
 import {useRecoilState} from "recoil";
 import {ReservationStatus} from "../../components/recoil/reservation";
 import barBanner from "../../assets/img/sampleBar.png"
-
+import axios from "axios";
 export default function MainPage() {
     const windowWidth = useWindowDimensions().width;
     const navigation = useNavigation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isReserved, setIsReserved] = useState(false);
     const [status, setStatus] = useRecoilState(ReservationStatus);
+    
     
     return (
         <>

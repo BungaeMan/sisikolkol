@@ -2,6 +2,8 @@ import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import {NavigationContainer, DefaultTheme} from "@react-navigation/native";
 import LinkingConfiguration from './LinkingConfiguration';
 import BottomTabNavigator from "./BottomTabNavigator";
+import LoginStack from "./LoginStack";
+
 
 export default function Navigation(){
     return (
@@ -16,8 +18,9 @@ export default function Navigation(){
 function RootNavigator() {
     
     return(
-        <Stack.Navigator initialRouteName="Root" screenOptions={{gestureEnabled: false, autoHideHomeIndicator: true}}>
+        <Stack.Navigator initialRouteName="LoginStack" screenOptions={{gestureEnabled: false, autoHideHomeIndicator: true}}>
             <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }}/>
+            <Stack.Screen name="LoginStack" component={LoginStack} options={{headerShown: false}} />
         </Stack.Navigator>
     )
     

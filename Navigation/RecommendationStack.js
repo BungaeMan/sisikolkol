@@ -1,8 +1,8 @@
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
-import MainPage from "../screens/MainPage/Mainpage";
-import ReservationPage from "../screens/MyPage/pages/ReservationPage"
-import RecommendationDetailPage from "../screens/RecommendationPage/RecommendationDetailPage"
-export default function HomeStack(){
+import RecommendationPage from "../screens/RecommendationPage/RecommendationPage";
+import RecommendationDetailPage from "../screens/RecommendationPage/RecommendationDetailPage";
+
+export default function RecommendationStack(){
     const Stack = createNativeStackNavigator();
     
     return (
@@ -11,21 +11,20 @@ export default function HomeStack(){
                 headerShadowVisible: false
             }}>
             <Stack.Screen
-                name="Home"
-                component={MainPage}
+                name="Recommendation"
+                component={RecommendationPage}
                 options={(navigation) => ({
                     headerShown: false
                 })}
-                />
-            <Stack.Screen
-                name="Reservation"
-                component={ReservationPage}
             />
             <Stack.Screen
-                name="Recommendation"
+                name="RecommendationDetail"
                 component={RecommendationDetailPage}
+                options={(navigation) => ({
+                    headerShown: false
+                })}
             />
-          
+
         </Stack.Navigator>
     )
 }
