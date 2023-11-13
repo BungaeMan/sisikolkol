@@ -1,9 +1,11 @@
 import {View, Text, Image, useWindowDimensions, StyleSheet, ScrollView, Pressable} from "react-native"
+import {useEffect, useState} from "react"
 import whiskeyBanner from "../../../assets/img/whiskeyBanner.png"
 import {colors} from "../../../components/common/style/colors";
 import downArrow from "../../../assets/img/filterDownArrow.png"
 import star from "../../../assets/img/ratingStar.png"
 import reviewImg from "../../../assets/img/reviewImg.png"
+import axios from "axios";
 
 
 /*
@@ -13,6 +15,11 @@ import reviewImg from "../../../assets/img/reviewImg.png"
 */
 export default function RecommendationWhisky() {
     const windowWidth = useWindowDimensions().width;
+    const [liquorList, setLiquorList] = useState(null);
+    
+    useEffect(() => {
+        axios.get("http://localhost:8080/liquor/info").then(res => setLiquorList(res.data))
+    }, [])
     
     return (
         <ScrollView style={{flex: 1}}>
@@ -48,27 +55,45 @@ export default function RecommendationWhisky() {
                     <Text style={{color: colors.darkGrey, fontSize: 12, fontWeight: "500"}}>총 00 개</Text>
                     
                     <View style={{flexDirection: "row", alignItems: "center", marginLeft: "auto"}}>
-                        <Text style={{marginRight: 3, color: colors.darkGrey, fontSize: 12, fontWeight: "500"}}>전체</Text>
+                        <Text
+                            style={{marginRight: 3, color: colors.darkGrey, fontSize: 12, fontWeight: "500"}}>전체</Text>
                         <Image source={downArrow}/>
                     </View>
                 
                 </View>
                 
-                <View style={{flexDirection: "row", flexWrap: "wrap", marginTop:12, paddingHorizontal: 22, justifyContent: "space-between"}}>
+                <View style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    marginTop: 12,
+                    paddingHorizontal: 22,
+                    justifyContent: "space-between"
+                }}>
                     {
-                        [1,2,3,4,5].map(item => (
-                            <View style={{paddingBottom:15}}>
-                                <View style={{width: 160, height: 150, marginRight: 10, marginBottom:10, backgroundColor: "black"}}/>
-                                <Text style={{color: colors.darkGrey, fontWeight: "700"}}>잭다니엘 99년산</Text>
-                                <Text style={{color: colors.darkGrey, fontSize: 12}}>720,000원</Text>
-                                <View style={{flexDirection: "row", marginTop:3 }}>
-                                    <Image source={star}/>
-                                    <Text style={{marginRight: 12, fontSize:10, fontWeight: "500", marginLeft:2}}>5.0</Text>
-                                    <Image source={reviewImg}/>
-                                    <Text style={{fontSize:10, fontWeight: "500", marginLeft:3}}>123</Text>
+                        !liquorList ?
+                            <Text>loading...</Text>
+                            :
+                            liquorList.map(item => (
+                                <View style={{paddingBottom: 15, flexWrap: "wrap"}}>
+                                    <View style={{width: 160, height: 150, marginBottom: 10, backgroundColor: "black"}}
+                                        />
+                                    <Text style={{color: colors.darkGrey, fontWeight: "700", width:160, marginBottom: 5}}>
+                                        {item.liquorName}
+                                    </Text>
+                                    <Text style={{color: colors.darkGrey, fontSize: 12}}>${item.liquorPrice}</Text>
+                                    <View style={{flexDirection: "row", marginTop: 3}}>
+                                        <Image source={star}/>
+                                        <Text style={{
+                                            marginRight: 12,
+                                            fontSize: 10,
+                                            fontWeight: "500",
+                                            marginLeft: 2
+                                        }}>4</Text>
+                                        <Image source={reviewImg}/>
+                                        <Text style={{fontSize: 10, fontWeight: "500", marginLeft: 3}}>123</Text>
+                                    </View>
                                 </View>
-                            </View>
-                        ))
+                            ))
                     }
                 
                 </View>

@@ -6,7 +6,7 @@ import {colors} from "../../../components/common/style/colors";
 export default function SignupPage({navigation}) {
     useEffect(() => {
         navigation.setOptions({
-            headerLeft: () => (<View style={{flexDirection: "row", alignItems: "row"}}>
+            headerLeft: () => (<View style={{flexDirection: "row", alignItems: "center"}}>
                 <Pressable onPress={() => navigation.goBack()}>
                     <Image source={backBtn}/>
                 </Pressable>
@@ -62,6 +62,20 @@ export default function SignupPage({navigation}) {
                         opacity: pressed ? 0.5 : 1
                     })}>
                         <Text style={styles.btnText}>닉네임 확인</Text>
+                    </Pressable>
+                </View>
+    
+                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop:10}}>
+                    <TextInput style={styles.inputStyle}
+                               placeholder={"이메일"}
+                               autoCapitalize="none"
+        
+                    />
+                    <Pressable style={({pressed})=> ({
+                        ...styles.bth,
+                        opacity: pressed ? 0.5 : 1
+                    })}>
+                        <Text style={styles.btnText}>이메일 확인</Text>
                     </Pressable>
                 </View>
                 

@@ -1,4 +1,4 @@
-import {Text, View, Image, Pressable} from "react-native";
+import {Text, View, Image, Pressable, StyleSheet} from "react-native";
 import {colors} from "../../../components/common/style/colors";
 import clockImg from "../../../assets/img/clockImg.png"
 import calenderImg from "../../../assets/img/calendarImg.png"
@@ -9,10 +9,12 @@ import CalendarPicker from 'react-native-calendar-picker';
 import moment from "moment";
 import nextArrow from "../../../assets/img/nextCalenderArrow.png"
 import backArrow from "../../../assets/img/backCalenderArrow.png"
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {Alert} from "react-native";
 import {ReservationStatus} from "../../../components/recoil/reservation";
 import {useRecoilState} from "recoil";
+import peopleImg from "../../../assets/img/peopleImg.png"
+import plus from "../../../assets/img/plus.png";
+import minus from "../../../assets/img/minus.png"
 
 
 export default function ReservationOrganism({info}) {
@@ -21,6 +23,7 @@ export default function ReservationOrganism({info}) {
     const [selectedDay, setSelectedDay] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
     const [status, setStatus] = useRecoilState(ReservationStatus);
+    const [peopleNum, setPeopleNum] = useState(0);
     
     //선택 날짜 변화 계산
     const onDateChange = (date) => {
@@ -45,10 +48,10 @@ export default function ReservationOrganism({info}) {
                 alignItems: "center",
                 width: 80,
                 height: 40,
-                borderWidth: 2,
-                borderColor: colors.mainOrange,
+                borderWidth: 1,
+                borderColor: "#BFBFBF",
                 backgroundColor: selectedTime === props.title ? colors.mainOrange : "white",
-                borderRadius: 5
+                borderRadius: 5,
             }}
                        onPress={() => {
                            if (selectedTime === props.title) {
@@ -92,8 +95,8 @@ export default function ReservationOrganism({info}) {
                                 onDateChange={(date) => onDateChange(date)}
                                 dayLabelsWrapper={{borderWidth: 0}}
                                 previousComponent={<Image source={backArrow}/>}
-                                nextComponent={<Image  source={nextArrow}/>}
-                                headerWrapperStyle={{justifyContent:"center"}}
+                                nextComponent={<Image source={nextArrow}/>}
+                                headerWrapperStyle={{justifyContent: "center"}}
                 
                 />
             }
@@ -128,49 +131,102 @@ export default function ReservationOrganism({info}) {
                             ))
                         }
                     </View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
+                    <View style={{flexDirection: "row", justifyContent: "space-between", marginVertical: 10}}>
                         {
                             ["17:00", "18:00", "19:00", "20:00"].map(item => (
                                 <TimeBtn key={item} title={item}/>
                             ))
                         }
                     </View>
-                    
+                
                 </View>
             }
-    
-            <Pressable style={({pressed})=>({
+            <View style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: 10,
+                borderBottomWidth: 1,
+                borderColor: "rgba(25, 13, 11, 0.10)",
+                paddingBottom: 10
+            }}>
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <Image source={peopleImg}/>
+                    <Text style={{fontWeight: "500", marginLeft: 6}}>인원</Text>
+                </View>
+                
+                {/*예약 인원수 버튼*/}
+                <View style={{width: 100, height: 30, flexDirection: "row", justifyContent: "space-between"}}>
+                    <Pressable
+                        style={({pressed}) => ({...styles.personBtn, borderRightWidth: 0, opacity: pressed ? 0.5 : 1})}
+                        onPress={() => setPeopleNum(cur => cur + 1)}
+                    >
+                        <Image source={plus}/>
+                    </Pressable>
+                    
+                    <View style={{
+                        borderWidth: 1,
+                        borderColor: colors.mainOrange,
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}>
+                        <Text style={{color: colors.mainOrange, fontWeight: "500"}}>{peopleNum}</Text>
+                    </View>
+                    
+                    <Pressable
+                        style={({pressed}) => ({...styles.personBtn, borderLeftWidth: 0, opacity: pressed ? 0.5 : 1})}
+                        onPress={() => setPeopleNum(cur => cur !== 0 ? cur - 1 : 0)}
+                    >
+                        <Image source={minus}/>
+                    </Pressable>
+                </View>
+            </View>
+            
+            <Pressable style={({pressed}) => ({
                 opacity: pressed ? 0.5 : 1,
                 marginTop: 50
             })}
-                       onPress={async ()=>{
-                           if(selectedTime && selectedDay){
+                       onPress={async () => {
+                           if (selectedTime && selectedDay) {
                                setStatus({
                                    ...info,
                                    date: selectedDay,
                                    time: selectedTime
                                })
                                Alert.alert("예약되었습니다.")
-                           }
-                           else{
+                           } else {
                                Alert.alert("날짜 및 시간을 선택해주세요.")
                            }
-                           
+                
                        }}
             >
                 <View style={{
                     width: "100%",
                     height: 50,
-                    backgroundColor: colors.mainOrange,
+                    // backgroundColor: colors.mainOrange,
+                    backgroundColor: colors.navy,
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: 10,
-            
+                    
                 }}>
-                    <Text style={{color:'white', fontWeight:700, fontSize:16 }}>예약</Text>
+                    <Text style={{color: 'white', fontWeight: 700, fontSize: 16}}>예약</Text>
                 </View>
             </Pressable>
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    personBtn: {
+        // backgroundColor: "rgb(6,6,72)",
+        width: 30,
+        alignItems: "center",
+        justifyContent: "center",
+        borderWidth: 1,
+        borderColor: "#BFBFBF"
+    }
+})
+
 

@@ -20,9 +20,6 @@ export default function RecommendationStack(){
             <Stack.Screen
                 name="RecommendationDetail"
                 component={RecommendationDetailPage}
-                options={(navigation) => ({
-                    headerShown: false
-                })}
             />
 
         </Stack.Navigator>

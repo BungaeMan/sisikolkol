@@ -3,23 +3,26 @@ import barImg from "../../../assets/img/barImgSample.png";
 import barBanner from "../../../assets/img/sampleBar.png"
 
 
-export default function BarListTemplate({mapList, setClickedCenterId}) {
+export default function BarListTemplate({mapList, setClickedCenterId, setCenterOfMap}) {
     
     
     return (
-        <ScrollView>
+            <ScrollView>
             {
                 mapList &&
                 mapList.map((item) => (
                     
-                    <Pressable key={item.id}
+                    <Pressable key={item.barID}
                         style={({pressed}) => ({
                         opacity: pressed ? 0.5 : 1,
                         justifyContent: 'center',
                         alignItems: "center",
                         borderBottomWidth: 3, borderBottomStyle: 'solid', borderBottomColor: '#F8F8F8',
                     })}
-                               onPress={() => setClickedCenterId(item.id)}
+                               onPress={() => {
+                                   setClickedCenterId(item.barID);
+                                   setCenterOfMap({lat: item.barLatitude, lng: item.barLongitude})
+                               }}
                     >
                         <View style={{
                             width: "100%",
@@ -39,12 +42,12 @@ export default function BarListTemplate({mapList, setClickedCenterId}) {
                                 paddingLeft: 12,
                                 justifyContent: "center"
                             }}>
-                                <Text>{item.name}</Text>
+                                <Text>{item.barName}</Text>
                                 <Text style={{
                                     fontSize: 12,
                                     opacity: 0.7,
                                     marginVertical: 6
-                                }}>{item.address}</Text>
+                                }}>{item.barAddress}</Text>
                                 <Text style={{
                                     color: "rgba(251, 128, 39, 0.83)",
                                     fontSize: 12

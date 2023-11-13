@@ -5,11 +5,12 @@ export default function BarInfoOrganism({info}){
     
     return(
         <View style={{flex:1, paddingHorizontal: 18}}>
-            <StyledRow title={"가게명"} content={info.name}/>
-            <StyledRow title={"주소"} content={info.address}/>
-            <StyledRow title={"운영시간"} content={"오전 7:00 - 오후 6:00"}/>
-            <StyledRow title={"전화번호"} content={"02-1234-5678"}/>
-            <View>
+            <StyledRow title={"가게명"} content={info.barName}/>
+            <StyledRow title={"주소"} content={info.barAddress}/>
+            <StyledRow title={"가게 유형"} content={info.barType}/>
+            
+            {/*<StyledRow title={"운영시간"} content={"오전 7:00 - 오후 6:00"}/>*/}
+            <View style={{marginTop:10}}>
                 <Text style={{ fontSize:12,
                     fontWeight:"500",
                     color: "#5B5B5B",
@@ -28,7 +29,7 @@ export default function BarInfoOrganism({info}){
                         fontWeight: "500",
                         color: colors.darkGrey,
                     }}>
-                        최상의 서비스와 맛으로 대접하곘습니다~!
+                        {info.barDetail}
                     </Text>
                 </View>
             </View>

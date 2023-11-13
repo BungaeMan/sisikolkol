@@ -67,11 +67,13 @@ export default function CommonMyPage(props) {
                 </View>
                 
                 <View style={{marginTop: 18}}>
-                    <View style={{flexDirection: "row", alignItems: "center", paddingBottom: 14}}>
+                    <Pressable style={{flexDirection: "row", alignItems: "center", paddingBottom: 14}}
+                               onPress={()=>props.navigation.navigate("Reservation")}
+                    >
                         <Image source={listImg} style={{marginRight: 7}}/>
                         <Text style={styles.rowTitle}>예약 내역</Text>
                         <Image source={nextArrow} style={{marginLeft: "auto"}}/>
-                    </View>
+                    </Pressable>
                     <View style={{
                         flexDirection: "row",
                         alignItems: "center",

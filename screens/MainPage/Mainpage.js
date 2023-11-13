@@ -73,7 +73,7 @@ export default function MainPage() {
                                     <Image style={{width: 90, height: 90, borderRadius: 10}} source={barBanner}/>
                                 </Pressable>
                                 :
-                                <View>
+                                <Pressable onPress={()=>navigation.navigate("BarStack", {screen: "BarPage"})}>
                                     <Text style={{fontSize: 10, opacity: 0.5, fontWeight: 500, textAlign: 'center'}}>
                                         예약된 정보가 없습니다.</Text>
                                     <View style={{
@@ -91,7 +91,7 @@ export default function MainPage() {
                                             fontWeight: 500
                                         }}>예약하기</Text>
                                     </View>
-                                </View>}
+                                </Pressable>}
                         </View>
                         {/*주류픽!*/}
                         <View style={{marginTop: 70, paddingHorizontal: 18}}>

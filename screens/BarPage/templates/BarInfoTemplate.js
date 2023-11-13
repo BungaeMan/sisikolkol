@@ -5,7 +5,8 @@ import {colors} from "../../../components/common/style/colors";
 import ratingStar from "../../../assets/img/ratingStar.png"
 import BarInfoOrganism from "../organisms/BarInfoOrganism";
 import ReservationOrganism from "../organisms/ReservationOrganism";
-import barBanner from "../../../assets/img/sampleBar.png"
+import barBanner from "../../../assets/img/sampleBar.png";
+import ReviewOrganism from "../organisms/ReviewOrganism";
 
 
 export default function BarInfoTemplate({mapList, clickedCenterId}) {
@@ -15,7 +16,7 @@ export default function BarInfoTemplate({mapList, clickedCenterId}) {
         {key: "third", title: "리뷰"}
     ]);
     const [index, setIndex] = useState(0);
-    const [centerInfo] = useState(mapList.find(e => e.id === clickedCenterId));
+    const [centerInfo] = useState(mapList.find(e => e.barID === clickedCenterId));
     
     const FirstRoute = () => (
         <BarInfoOrganism info={centerInfo}/>
@@ -26,8 +27,7 @@ export default function BarInfoTemplate({mapList, clickedCenterId}) {
     )
     
     const ThirdRoute = () => (
-        <View>
-        </View>
+        <ReviewOrganism />
     )
     
     const renderScene = SceneMap({
@@ -69,18 +69,13 @@ export default function BarInfoTemplate({mapList, clickedCenterId}) {
                 }}
                 />
                 <Text style={{
-                    color: colors.mainOrange,
-                    fontWeight: "700",
-                    fontSize: 12
-                }}>영업중</Text>
-                <Text style={{
                     fontSize: 18,
                     fontWeight: "500",
                     marginVertical: 2
-                }}>{centerInfo.name}</Text>
+                }}>{centerInfo.barName}</Text>
                 <View style={{flexDirection: "row", alignItems: "center"}}>
                     <Image source={ratingStar} style={{marginRight: 4}}/>
-                    <Text>{centerInfo.ratings}</Text>
+                    <Text>{4}</Text>
                 </View>
             </View>
             <TabView style={{height: 800}}

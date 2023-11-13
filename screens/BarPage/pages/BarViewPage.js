@@ -1,4 +1,4 @@
-import {StyleSheet, View, Text, ScrollView, useWindowDimensions, Keyboard, Platform, Pressable, Image} from 'react-native';
+import {StyleSheet, View, Text, TextInput, useWindowDimensions, Keyboard, Platform, Pressable, Image} from 'react-native';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
 import {useEffect, useState} from "react"
 import {useIsFocused,} from '@react-navigation/native';
@@ -14,6 +14,7 @@ import markerPin from "../../../assets/img/marker.png"
 import BarListTemplate from "../templates/BarListTemplate";
 import BarInfoTemplate from "../templates/BarInfoTemplate";
 import axios from "axios";
+import search from "../../../assets/img/searchImg.png"
 
 
 //더미 데이터
@@ -33,7 +34,7 @@ const markerSize = {
 
 
 export default function BarViewPage() {
-    const _height = useSharedValue(1000);
+    const _height = useSharedValue(280);
     const isFocused = useIsFocused();
     const [location, setLocation] = useState(null); // 위경도
     const [level, setLevel] = useState(14); // 지도 확대축소 level 담는 state
@@ -45,13 +46,12 @@ export default function BarViewPage() {
     
     
     const handleClickMarker = (id) => {
-        const marker = mapList.find(e => e.id === id);
-        console.log(marker)
+        const marker = mapList.find(e => e.barID === id);
         if (id === clickedCenterId) {
             setClickedCenterId(null);
         } else {
-            setClickedCenterId(marker.id);
-            setCenterOfMap({lat: marker.latitude, lng: marker.longitude});
+            setClickedCenterId(marker.barID);
+            setCenterOfMap({lat: marker.barLatitude, lng: marker.barLongitude});
         }
     }
     
@@ -103,7 +103,7 @@ export default function BarViewPage() {
     }, [isFocused]);
     
     useEffect(()=> {
-        axios.get(`http://localhost:8080/coordinate`).then(res => setMapList(res.data));
+        axios.get(`http://localhost:8080/bar/coordinate`).then(res => setMapList(res.data));
     }, []);
     
    
@@ -126,9 +126,9 @@ export default function BarViewPage() {
                                     : {latitude: location.lat, longitude: location.lng, zoom: level}
                             }
                             onCameraChange={(e) => {
-                                // console.log("onCameraChange is called:", e.latitude, e.longitude, e.zoom);
                                 
                                 if (mapStabled) {
+                                    console.log("onCameraChange is called:", e.latitude, e.longitude, e.zoom);
                                     setCenterOfMap({
                                         lat: e.latitude,
                                         lng: e.longitude,
@@ -145,21 +145,29 @@ export default function BarViewPage() {
                             {
                                 mapList &&
                                 mapList.map((item) => (
-                                    <Marker key={item.id}
-                                            coordinate={{latitude: item.latitude, longitude: item.longitude}}
-                                            onClick={() => handleClickMarker(item.id)}
+                                    <Marker key={item.barID}
+                                            coordinate={{latitude: item.barLatitude, longitude: item.barLongitude}}
+                                            onClick={() => handleClickMarker(item.barID)}
                                             image={markerPin}
-                                            width={item.id === clickedCenterId ? markerSize.width * 1.4 : markerSize.width}
-                                            height={item.id === clickedCenterId ? markerSize.height * 1.4 : markerSize.height}
+                                            width={item.barID === clickedCenterId ? markerSize.width * 1.4 : markerSize.width}
+                                            height={item.barID === clickedCenterId ? markerSize.height * 1.4 : markerSize.height}
                                     />
                                 ))
                             }
                         </NaverMapView>
+                        <View style={styles.searchBar}>
+                            <Pressable style={{ position: 'absolute', top: 12, left: 30, zIndex: 1000}}>
+                                <Image source={search} style={{opacity: 0.7}}/>
+                            </Pressable>
+                            <TextInput placeholder="시설 이름 검색" placeholderTextColor={'#D9D9D9'} style={styles.searchInput}  />
+                        </View>
                         <CenterModal _height={_height}>
                             <Animated.View style={viewAnimated}>
                                 {
                                     !clickedCenterId ?
-                                        <BarListTemplate mapList={mapList} setClickedCenterId={setClickedCenterId}/>
+                                        <BarListTemplate mapList={mapList} setClickedCenterId={setClickedCenterId}
+                                                         setCenterOfMap={setCenterOfMap}
+                                        />
                                         :
                                         <BarInfoTemplate mapList={mapList}
                                                          clickedCenterId={clickedCenterId}
@@ -176,7 +184,7 @@ export default function BarViewPage() {
 const CenterModal = (props) => {
     const isPressed = useSharedValue(false);
     const layout = useWindowDimensions();
-    const offset = useSharedValue({y: layout.height * 0.5});
+    const offset = useSharedValue({y: layout.height * 0.55});
     const animatedStyles = useAnimatedStyle(() => {
         return {
             transform: [
@@ -203,14 +211,13 @@ const CenterModal = (props) => {
         "worklet";
         offset.value = {
             y: offset.value.y > layout.height * 0.7 ? layout.height * 0.85
-                : offset.value.y <= layout.height * 0.7 && offset.value.y > layout.height * 0.3 ? layout.height * 0.5
+                : offset.value.y <= layout.height * 0.7 && offset.value.y > layout.height * 0.4 ? layout.height * 0.55
                     : layout.height * 0.1
         };
         props._height.value = Platform.OS === "ios" ? layout.height - offset.value.y - 30 - 85
             : layout.height - offset.value.y - 30 - 92 - 100;
         isPressed.value = false;
     })
-    
     
     return (
         <>
@@ -219,14 +226,13 @@ const CenterModal = (props) => {
                 width: "100%",
                 height: "150%",
                 alignSelf: 'center',
-                backgroundColor: "white"
+                backgroundColor: "white",
+                borderRadius:10
             }, animatedStyles]}>
                 <GestureDetector gesture={gesture}>
                     <View style={{
                         width: "100%",
                         height: 30,
-                        borderTopRightRadius: 10,
-                        borderTopLeftRadius: 10,
                         alignItems: "center",
                         justifyContent: "center"
                         // backgroundColor: "red"
@@ -245,3 +251,23 @@ const CenterModal = (props) => {
         </>
     )
 }
+
+
+const styles = StyleSheet.create({
+    searchBar:{
+        paddingHorizontal: 18,
+        position: 'absolute',
+        top: 60,
+        flexDirection: 'row',
+        borderRadius: 10,
+    },
+    searchInput: {
+        backgroundColor: "#F9F7F8",
+        width: '100%',
+        height: 40,
+        borderRadius: 10,
+        fontSize: 12, fontWeight: '400',
+        color: '#474348',
+        paddingHorizontal: 38,
+    },
+})

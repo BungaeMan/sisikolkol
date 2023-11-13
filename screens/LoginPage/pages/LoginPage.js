@@ -1,11 +1,11 @@
-import {View, Text, TouchableWithoutFeedback, StyleSheet, Keyboard, TextInput, Pressable, Alert} from "react-native"
+import {View, Text, TouchableWithoutFeedback, StyleSheet, Keyboard, TextInput, Pressable, Alert, Image} from "react-native"
 import {colors} from "../../../components/common/style/colors";
 import {useState} from "react";
 import {LoginStatus, UserInfo} from "../../../components/recoil/LoginStore";
 import {useSetRecoilState} from "recoil";
 import {useNavigation} from "@react-navigation/native";
-import axios from "axios";
-
+import logo from "../../../assets/img/logoOrange.png"
+import axios from "axios"
 
 export default function LoginPage() {
     const [loginID, setLoginID] = useState("");
@@ -26,25 +26,26 @@ export default function LoginPage() {
                 }).then(res => {
                 setLoginStatus(true);
                 setUserInfo(res.data);
-                
+                console.log(res.data)
             })
             
             navigation.navigate("Root");
             Alert.alert("로그인 성공");
-            console.log("ddada")
         } catch (err) {
-            Alert.alert("error!")
+            Alert.alert("error");
+            console.log(err);
         }
     }
-    console.log(loginID)
-    console.log(loginPW)
+    // console.log(loginID)
+    // console.log(loginPW)
     
     return (
         <>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={{flex: 1, justifyContent: "center", }}>
                     <View style={{alignItems: "center"}}>
-                        <Text style={{fontSize:18, fontWeight:700}}>시시콜콜</Text>
+                        {/*<Text style={{fontSize:18, fontWeight:700}}>시시콜콜</Text>*/}
+                        <Image source={logo} style={{width: 80, height: 80}}/>
                         <TextInput style={styles.textInput}
                                    value={loginID}
                                    onChangeText={text => setLoginID(text)}
@@ -62,7 +63,7 @@ export default function LoginPage() {
                                    secureTextEntry={true}
                                    autoCorrect={false}
                         />
-                        <Pressable style={{...styles.textInput, backgroundColor: colors.mainOrange, alignItems: "center", justifyContent: "center", marginTop: 15}}
+                        <Pressable style={{...styles.textInput, backgroundColor:"rgb(236,104,55)", alignItems: "center", justifyContent: "center", marginTop: 15}}
                                    onPress={onClickLogin}
                             >
                             <Text style={{color: "white", fontWeight: 500, fontSize: 14}}>

@@ -22,16 +22,7 @@ export default function MyPageStack(){
             <Stack.Screen
                 name="Reservation"
                 component={ReservationPage}
-                options={({navigation}) => ({
-                    headerLeft:()=>(
-                        
-                        <Pressable onPress={()=>{
-                            navigation.navigate('MyPage');
-                        }
-                        }>
-                        </Pressable>
-                    )
-                })}
+                
             />
         </Stack.Navigator>
     )
