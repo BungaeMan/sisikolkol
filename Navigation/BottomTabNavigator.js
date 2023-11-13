@@ -1,6 +1,5 @@
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import HomeStack from "./HomeStack";
-import BarViewPage from "../screens/BarPage/pages/BarViewPage";
 import {colors} from "../components/common/style/colors";
 import {HomeIcon, PubIcon, MyPageIcon, DrinkIcon} from "../components/TabBarIcon";
 import MyPageStack from "./MyPageStack";
