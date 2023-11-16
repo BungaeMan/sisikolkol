@@ -1,6 +1,17 @@
-import {StyleSheet, View, Text, TextInput, useWindowDimensions, Keyboard, Platform, Pressable, Image} from 'react-native';
+import {
+    StyleSheet,
+    View,
+    Text,
+    TextInput,
+    useWindowDimensions,
+    Keyboard,
+    Platform,
+    Pressable,
+    Image,
+    Alert
+} from 'react-native';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
-import {useEffect, useState} from "react"
+import {useEffect, useState, useCallback} from "react"
 import {useIsFocused,} from '@react-navigation/native';
 import * as Location from 'expo-location'
 import Animated, {
@@ -15,17 +26,8 @@ import BarListTemplate from "../templates/BarListTemplate";
 import BarInfoTemplate from "../templates/BarInfoTemplate";
 import axios from "axios";
 import search from "../../../assets/img/searchImg.png"
+import {useFocusEffect} from "@react-navigation/native";
 
-
-//더미 데이터
-// const mapList = [{
-//     id: 1,
-//     name:"홍대 바 본점",
-//     latitude: 37.5505,
-//     longitude: 126.9255,
-//     address: "서울특별시 마포구 와우산로 94",
-//     ratings: 4.5
-// }];
 
 const markerSize = {
     width: 21,
@@ -43,6 +45,7 @@ export default function BarViewPage() {
     const [centerOfMap, setCenterOfMap] = useState(null);
     const [mapStabled, setMapStabled] = useState(false); // NaverMap generates onCameraChange event when it is first initialized.
     const [mapList, setMapList] = useState(null);
+    const [searchText, setSearchText] = useState("");
     
     
     const handleClickMarker = (id) => {
@@ -63,50 +66,68 @@ export default function BarViewPage() {
         }
     })
     
-    useEffect(() => {
-        if (!isFocused) return;
-        
-        (async () => {
-                try {
-                    let {status} = await Location.requestForegroundPermissionsAsync();
-                    if (status !== "granted") {
-                        console.log("Permission to access loaction was denied.");
-                        return
-                    }
-                    
-                    let location = await Location.getLastKnownPositionAsync({});
-                    //location을 못불러올 시
-                    if (!location) {
-                        location = await Location.getCurrentPositionAsync({});
-                    }
-                    if (location.coords.longitude < 0) {
-                        location.coords.longitude = Math.abs(location.coords.longitude);
-                    }
-                    
-                    setLocation({lat: location.coords.latitude, lng: location.coords.longitude});
-                    if (33 < location.coords.latitude && location.coords.latitude < 43
-                        && 124 < location.coords.longitude && location.coords.longitude < 132) {
+    const handleSearch = async () => {
+        try {
+            if (searchText === "") {
+                axios.get(`http://localhost:8080/bar/coordinate`).then(res => setMapList(res.data));
+            } else {
+                await axios.get(`http://localhost:8080/bar/search/${searchText}`)
+                .then(res => setMapList(res.data));
+            }
+            
+            
+        } catch (err) {
+            Alert.alert("가게 정보를 찾을 수 없습니다.");
+            console.log(err);
+        }
+    }
+    
+    useFocusEffect(
+        useCallback(() => {
+            if (!isFocused) return;
+            
+            (async () => {
+                    try {
+                        let {status} = await Location.requestForegroundPermissionsAsync();
+                        if (status !== "granted") {
+                            console.log("Permission to access loaction was denied.");
+                            return
+                        }
+                        
+                        let location = await Location.getLastKnownPositionAsync({});
+                        //location을 못불러올 시
+                        if (!location) {
+                            location = await Location.getCurrentPositionAsync({});
+                        }
+                        if (location.coords.longitude < 0) {
+                            location.coords.longitude = Math.abs(location.coords.longitude);
+                        }
+                        
                         setLocation({lat: location.coords.latitude, lng: location.coords.longitude});
-                    } else {
-                        alert("현재 위치가 한국이 아니므로, 위치를 임의로 정합니다.");
-                        setLocation({lat: 37.5505, lng: 126.9255}) //홍대위치
+                        if (33 < location.coords.latitude && location.coords.latitude < 43
+                            && 124 < location.coords.longitude && location.coords.longitude < 132) {
+                            setLocation({lat: location.coords.latitude, lng: location.coords.longitude});
+                        } else {
+                            alert("현재 위치가 한국이 아니므로, 위치를 임의로 정합니다.");
+                            setLocation({lat: 37.5505, lng: 126.9255}) //홍대위치
+                        }
+                    } catch (err) {
+                        console.log("Error in expo Location service", err);
+                        setLocation({lat: 37.5505, lng: 126.9255});
+                        
                     }
-                } catch (err) {
-                    console.log("Error in expo Location service", err);
-                    setLocation({lat: 37.5505, lng: 126.9255});
+                    setLoading(false);
                     
                 }
-                setLoading(false);
-                
-            }
-        )();
-    }, [isFocused]);
+            )();
+        }, [isFocused]));
     
-    useEffect(()=> {
-        axios.get(`http://localhost:8080/bar/coordinate`).then(res => setMapList(res.data));
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            axios.get(`http://localhost:8080/bar/coordinate`).then(res => setMapList(res.data));
+        }, []));
     
-   
+    console.log(searchText);
     return (
         <>
             {
@@ -156,10 +177,17 @@ export default function BarViewPage() {
                             }
                         </NaverMapView>
                         <View style={styles.searchBar}>
-                            <Pressable style={{ position: 'absolute', top: 12, left: 30, zIndex: 1000}}>
+                            <Pressable style={{position: 'absolute', top: 12, left: 30, zIndex: 1000}}>
                                 <Image source={search} style={{opacity: 0.7}}/>
                             </Pressable>
-                            <TextInput placeholder="시설 이름 검색" placeholderTextColor={'#D9D9D9'} style={styles.searchInput}  />
+                            <TextInput placeholder="시설 이름 검색"
+                                       value={searchText}
+                                       onChangeText={(text) => setSearchText(text)}
+                                       onSubmitEditing={handleSearch}
+                                       autoCapitalize="none"
+                                       autoCompleteType="off"
+                                       placeholderTextColor={'#D9D9D9'}
+                                       style={styles.searchInput}/>
                         </View>
                         <CenterModal _height={_height}>
                             <Animated.View style={viewAnimated}>
@@ -227,7 +255,7 @@ const CenterModal = (props) => {
                 height: "150%",
                 alignSelf: 'center',
                 backgroundColor: "white",
-                borderRadius:10
+                borderRadius: 10
             }, animatedStyles]}>
                 <GestureDetector gesture={gesture}>
                     <View style={{
@@ -254,7 +282,7 @@ const CenterModal = (props) => {
 
 
 const styles = StyleSheet.create({
-    searchBar:{
+    searchBar: {
         paddingHorizontal: 18,
         position: 'absolute',
         top: 60,

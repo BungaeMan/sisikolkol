@@ -3,13 +3,25 @@ import nextArrow from "../../../assets/img/nextCalenderArrow.png"
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {colors} from "../../../components/common/style/colors";
-import heartImg from "../../../assets/img/heart.png"
-import listImg from "../../../assets/img/listImg.png"
-import {LoginStatus} from "../../../components/recoil/LoginStore";
+import {LoginStatus, UserInfo} from "../../../components/recoil/LoginStore";
+import axios from "axios";
+import {useCallback, useEffect, useState} from "react";
+import {useFocusEffect} from "@react-navigation/native";
 
 
 export default function CommonMyPage(props) {
     const setLoginStatus = useSetRecoilState(LoginStatus); //로그인 상태
+    const userInfo = useRecoilValue(UserInfo);
+    const [reviewList, setReviewList] = useState(null);
+    const [barReviewList, setBarReviewList] = useState(null);
+    
+    useFocusEffect(
+        useCallback(() => {
+            axios.get(`http://localhost:8080/liquor/review/${userInfo.userNickname}`)
+            .then(res => setReviewList(res.data.reviews));
+            axios.get(`http://localhost:8080/bar/review/${userInfo.userNickname}`)
+            .then(res => setBarReviewList(res.data.reviewedBars));
+        }, []));
     
     
     const logOut = () => {
@@ -33,10 +45,11 @@ export default function CommonMyPage(props) {
         )
     }
     
+    
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: "white"}}>
-            <View style={{flex: 1, backgroundColor: "white", paddingHorizontal: 18, paddingTop: 30}}>
-                <View style={{flexDirection: "row", alignItems: "center"}}>
+            <View style={{flex: 1, backgroundColor: "white", paddingTop: 30}}>
+                <View style={{flexDirection: "row", alignItems: "center", paddingHorizontal: 18,}}>
                     <Text style={{color: colors.darkGrey, fontWeight: "700", fontSize: 18, marginRight: 7}}>홍길동</Text>
                     <Image source={nextArrow}/>
                 </View>
@@ -45,54 +58,79 @@ export default function CommonMyPage(props) {
                     alignItems: "center",
                     justifyContent: "space-between",
                     backgroundColor: "#F6F9FE",
-                    width: "100%",
                     height: 100,
                     borderRadius: 10,
                     marginVertical: 20,
-                    paddingHorizontal: 40
+                    paddingHorizontal: 40,
+                    marginHorizontal: 18
                 }}>
                     <View style={{alignItems: "center"}}>
                         <Text style={styles.title}>리뷰</Text>
                         <Text style={styles.content}>10</Text>
                     </View>
                     <View style={{alignItems: "center"}}>
-                        <Text style={styles.title}>리뷰</Text>
-                        <Text style={styles.content}>10</Text>
+                        <Text style={styles.title}>주류 리뷰</Text>
+                        <Text style={styles.content}>{reviewList ? reviewList.length : 0}</Text>
                     
                     </View>
                     <View style={{alignItems: "center"}}>
-                        <Text style={styles.title}>리뷰</Text>
-                        <Text style={styles.content}>10</Text>
+                        <Text style={styles.title}>가게 리뷰</Text>
+                        <Text style={styles.content}>{barReviewList ? barReviewList.length : 0}</Text>
                     </View>
                 </View>
                 
-                <View style={{marginTop: 18}}>
+                <View style={{marginTop: 18, paddingHorizontal: 18}}>
                     <Pressable style={{flexDirection: "row", alignItems: "center", paddingBottom: 14}}
-                               onPress={()=>props.navigation.navigate("Reservation")}
+                               onPress={() => props.navigation.navigate("Reservation")}
                     >
-                        <Image source={listImg} style={{marginRight: 7}}/>
+                        {/*<Image source={listImg} style={{marginRight: 7}}/>*/}
                         <Text style={styles.rowTitle}>예약 내역</Text>
                         <Image source={nextArrow} style={{marginLeft: "auto"}}/>
                     </Pressable>
-                    <View style={{
+                    
+                    <Pressable style={{
                         flexDirection: "row",
                         alignItems: "center",
                         borderTopWidth: 0.5,
                         borderBottomWidth: 0.5,
                         borderColor: "rgba(0,0,0,0.3)",
                         paddingVertical: 18,
-                    }}>
-                        <Image source={heartImg} style={{marginRight: 7}}/>
+                    }}
+                               onPress={() => props.navigation.navigate("BookmarkWhiskey")}
+                    >
                         <Text style={styles.rowTitle}>내가 찜한 주류</Text>
                         <Image source={nextArrow} style={{marginLeft: "auto"}}/>
-                    </View>
-                    <View style={{flexDirection: "row", alignItems: "center", paddingTop: 16}}>
-                        <Image source={listImg} style={{marginRight: 7}}/>
+                    </Pressable>
+                    
+                    <Pressable onPress={() => props.navigation.navigate("BookmarkBar")}
+                               style={{flexDirection: "row", alignItems: "center", paddingTop: 16}}>
                         <Text style={styles.rowTitle}>내가 찜한 가게</Text>
                         <Image source={nextArrow} style={{marginLeft: "auto"}}/>
-                    </View>
+                    </Pressable>
+                
                 </View>
-                <View style={{marginTop: 40}}>
+                <View style={{backgroundColor: "#DFDFDF", height: 7, marginTop: 20}}/>
+                
+                <View style={{paddingHorizontal: 18}}>
+                    
+                    <Pressable onPress={() => props.navigation.navigate("LiquorReview", {reviewList: reviewList})}
+                               style={{
+                                   paddingVertical: 18,
+                                   flexDirection: "row", alignItems: "center", paddingTop: 16, borderBottomWidth: 0.5,
+                                   borderColor: "rgba(0,0,0,0.3)",
+                               }}>
+                        <Text style={styles.rowTitle}>주류 리뷰</Text>
+                        <Image source={nextArrow} style={{marginLeft: "auto"}}/>
+                    </Pressable>
+                    
+                    <Pressable onPress={() => props.navigation.navigate("BarReview", {reviewList: barReviewList})}
+                               style={{flexDirection: "row", alignItems: "center", paddingTop: 16}}>
+                        <Text style={styles.rowTitle}>가게 리뷰</Text>
+                        <Image source={nextArrow} style={{marginLeft: "auto"}}/>
+                    </Pressable>
+                </View>
+                
+                <View style={{marginTop: 40, paddingHorizontal: 18}}>
                     <Text style={styles.underText}>비밀번호 변경</Text>
                     <Pressable onPress={logOut}>
                         <Text style={{...styles.underText, marginVertical: 15}}>로그아웃</Text>
@@ -101,6 +139,7 @@ export default function CommonMyPage(props) {
                 
                 </View>
             </View>
+        
         </SafeAreaView>
     )
 }

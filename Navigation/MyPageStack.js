@@ -1,8 +1,11 @@
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import ReservationPage from "../screens/MyPage/pages/ReservationPage"
-import {Pressable} from "react-native";
 import CommonMyPage from "../screens/MyPage/pages/CommonMyPage";
-
+import BookmarkWhiskey from "../screens/MyPage/pages/BookmarkWhiskey";
+import RecommendationDetailPage from "../screens/RecommendationPage/RecommendationDetailPage";
+import BookmarkBar from "../screens/MyPage/pages/BookmarkBar";
+import MyLiquorReview from "../screens/MyPage/pages/MyLiquorReview";
+import MyBarReview from "../screens/MyPage/pages/MyBarReview";
 
 export default function MyPageStack(){
     const Stack = createNativeStackNavigator();
@@ -24,6 +27,27 @@ export default function MyPageStack(){
                 component={ReservationPage}
                 
             />
+            <Stack.Screen
+                name="BookmarkWhiskey"
+                component={BookmarkWhiskey}
+            />
+            <Stack.Screen
+                name="LiquorReview"
+                component={MyLiquorReview}
+            />
+            <Stack.Screen
+                name="BarReview"
+                component={MyBarReview}
+            />
+            <Stack.Screen
+                name="WhiskeyDetail"
+                component={RecommendationDetailPage}
+            />
+            <Stack.Screen
+                name="BookmarkBar"
+                component={BookmarkBar}
+            />
+            
         </Stack.Navigator>
     )
 }

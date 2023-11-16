@@ -6,6 +6,7 @@ import {useSetRecoilState} from "recoil";
 import {useNavigation} from "@react-navigation/native";
 import logo from "../../../assets/img/logoOrange.png"
 import axios from "axios"
+import loginImg from "../../../assets/img/login.png"
 
 export default function LoginPage() {
     const [loginID, setLoginID] = useState("");
@@ -42,10 +43,10 @@ export default function LoginPage() {
     return (
         <>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={{flex: 1, justifyContent: "center", }}>
+                <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                        <Image source={loginImg} style={{position: "absolute", width: 120, height: 50, top:250}}/>
                     <View style={{alignItems: "center"}}>
                         {/*<Text style={{fontSize:18, fontWeight:700}}>시시콜콜</Text>*/}
-                        <Image source={logo} style={{width: 80, height: 80}}/>
                         <TextInput style={styles.textInput}
                                    value={loginID}
                                    onChangeText={text => setLoginID(text)}
@@ -63,7 +64,7 @@ export default function LoginPage() {
                                    secureTextEntry={true}
                                    autoCorrect={false}
                         />
-                        <Pressable style={{...styles.textInput, backgroundColor:"rgb(236,104,55)", alignItems: "center", justifyContent: "center", marginTop: 15}}
+                        <Pressable style={{...styles.textInput, backgroundColor:colors.mainOrange, alignItems: "center", justifyContent: "center", marginTop: 15}}
                                    onPress={onClickLogin}
                             >
                             <Text style={{color: "white", fontWeight: 500, fontSize: 14}}>

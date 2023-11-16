@@ -4,73 +4,126 @@ import clockImg from "../../../assets/img/clockImg.png"
 import calenderImg from "../../../assets/img/calendarImg.png"
 import downArrow from "../../../assets/img/downArrow.png"
 import upArrow from "../../../assets/img/upArrow.png"
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import CalendarPicker from 'react-native-calendar-picker';
 import moment from "moment";
 import nextArrow from "../../../assets/img/nextCalenderArrow.png"
 import backArrow from "../../../assets/img/backCalenderArrow.png"
 import {Alert} from "react-native";
-import {ReservationStatus} from "../../../components/recoil/reservation";
-import {useRecoilState} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import peopleImg from "../../../assets/img/peopleImg.png"
 import plus from "../../../assets/img/plus.png";
 import minus from "../../../assets/img/minus.png"
+import axios from "axios";
+import {UserInfo} from "../../../components/recoil/LoginStore";
 
 
-export default function ReservationOrganism({info}) {
+export default function ReservationOrganism({info, setFlag}) {
     const [openCalender, setOpenCalender] = useState(false);
     const [openClock, setOpenClock] = useState(false);
     const [selectedDay, setSelectedDay] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
-    const [status, setStatus] = useRecoilState(ReservationStatus);
     const [peopleNum, setPeopleNum] = useState(0);
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [reservedTime, setReservedTime] = useState([]);
+    const userInfo = useRecoilValue(UserInfo);
+    const [dateFlag, setDateFlag] = useState(false);
     
     //선택 날짜 변화 계산
     const onDateChange = (date) => {
-        // setSelectedDay(date);
         const tmp = String(moment(date).format("MM-DD"));
         const tmp2 = tmp.split("-");
+        const tmp3 = String(moment(date).format("YYYY-MM-DD"))
         const tmpDate = new Date(date);
         const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
         const dayIndex = tmpDate.getDay();
         const dayOfWeek = daysOfWeek[dayIndex];
-        console.log(dayOfWeek);
         setSelectedDay(`${tmp2[0]}월 ${tmp2[1]}일 ${dayOfWeek}요일`);
+        setSelectedDate(tmp3);
+        setReservedTime([]);
+        console.log("seectedDate", tmp3);
+        setDateFlag(cur => !cur);
     }
     
-    console.log(status);
+    useEffect(()=>{
+        if(!selectedDate)return;
+    
+        info.barReservation.map(item => {
+            if(item.includes(selectedDate)){
+                setReservedTime(cur => [...cur, item])
+            }
+        });
+    }, [selectedDate, dateFlag])
+    
+    console.log(reservedTime)
+    
     
     const TimeBtn = (props) => {
+        let bool = false;
+        const tL = props.title.length;
+        const sL = props.start.length;
+        const eL = props.end.length;
+        
+    
+        if(tL === 5){
+            if(sL === 5 && eL === 5){
+                bool = props.title >= props.start && props.title < props.end;
+            }
+            else if(sL === 5 && eL === 4){
+                bool = props.title >= props.start;
+            }
+        }
+        else{
+            if(sL === 5 && eL === 5){
+                bool = false;
+            }
+            else if(sL === 5 && eL === 4){
+                bool = props.title < props.end;
+            }
+        }
+        reservedTime.forEach(item => bool = item.includes(props.title) ? false : bool)
         
         return (
-            <Pressable style={{
-                justifyContent: "center",
-                alignItems: "center",
-                width: 80,
-                height: 40,
-                borderWidth: 1,
-                borderColor: "#BFBFBF",
-                backgroundColor: selectedTime === props.title ? colors.mainOrange : "white",
-                borderRadius: 5,
-            }}
-                       onPress={() => {
-                           if (selectedTime === props.title) {
-                               setSelectedTime(null);
-                           } else {
-                               setSelectedTime(props.title);
-                           }
-                       }}
-            >
-                <Text style={{
-                    fontWeight: "500",
-                    color: selectedTime === props.title ? "white" : "black"
-                }}>{props.title}</Text>
-            </Pressable>
+            
+                    <Pressable style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: 80,
+                        height: 40,
+                        borderWidth: 1,
+                        borderColor: "#BFBFBF",
+                        backgroundColor: selectedTime === props.title ? colors.mainOrange : "white",
+                        borderRadius: 5,
+                        marginHorizontal: 3,
+                        marginVertical: 4,
+                        opacity: !bool ? 0.5 : 1
+                    }}
+                               onPress={() => {
+                                   if(bool){
+                                       if (selectedTime === props.title) {
+                                           setSelectedTime(null);
+                                       } else {
+                                           setSelectedTime(props.title);
+                                       }
+                                   }
+                               }}
+                    >
+                        <Text style={{
+                            fontWeight: "500",
+                            color: selectedTime === props.title ? "white" : "black"
+                        }}>{props.title}</Text>
+                    </Pressable>
+                    
+             
+    
         )
     }
     
+    // console.log(info);
+    
+    
     return (
-        <View style={{paddingHorizontal: 18}}>
+        <View style={{paddingHorizontal: 18, marginTop:20}}>
             <Pressable style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -106,35 +159,24 @@ export default function ReservationOrganism({info}) {
                 borderBottomWidth: 0.5,
                 borderColor: "rgba(25, 13, 11, 0.50)",
                 paddingBottom: 11,
-                marginTop: 10
+                marginTop: 10,
+                opacity: selectedDate ? 1 : 0.5
             }}
-                       onPress={() => setOpenClock(cur => !cur)}
+                       onPress={() => selectedDate && setOpenClock(cur => !cur)}
             >
                 <Image source={clockImg}/>
                 <Text style={{marginLeft: 6, fontWeight: 500}}>{selectedTime ? selectedTime : "시간 선택"}</Text>
                 <Image source={openClock ? upArrow : downArrow} style={{marginLeft: "auto"}}/>
             </Pressable>
             {
-                openClock &&
+                selectedDate && openClock &&
                 <View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
+                    <View style={{flexDirection: "row", justifyContent: "center", marginTop: 10, flexWrap:"wrap"}}>
                         {
-                            ["9:00", "10:00", "11:00", "12:00"].map(item => (
-                                <TimeBtn key={item} title={item}/>
-                            ))
-                        }
-                    </View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 10}}>
-                        {
-                            ["13:00", "14:00", "15:00", "16:00"].map(item => (
-                                <TimeBtn key={item} title={item}/>
-                            ))
-                        }
-                    </View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between", marginVertical: 10}}>
-                        {
-                            ["17:00", "18:00", "19:00", "20:00"].map(item => (
-                                <TimeBtn key={item} title={item}/>
+                            ["17:00", "18:00", "19:00", "20:00","21:00", "22:00", "23:00", "24:00", "1:00",
+                                "2:00", "3:00", "4:00"
+                            ].map(item => (
+                                <TimeBtn key={item} title={item} start={info.barStartTime} end={info.barEndTime}/>
                             ))
                         }
                     </View>
@@ -188,15 +230,16 @@ export default function ReservationOrganism({info}) {
                 marginTop: 50
             })}
                        onPress={async () => {
-                           if (selectedTime && selectedDay) {
-                               setStatus({
-                                   ...info,
-                                   date: selectedDay,
-                                   time: selectedTime
+                           if (selectedTime && selectedDate && peopleNum) {
+                               await axios.post(`http://localhost:8080/bar/reservation/${info.barID}`,{
+                                   userID: userInfo.userID,
+                                   reservationTime: selectedDate + ' ' + selectedTime,
+                                   reservationNum: peopleNum
                                })
+                               setFlag(cur => !cur);
                                Alert.alert("예약되었습니다.")
                            } else {
-                               Alert.alert("날짜 및 시간을 선택해주세요.")
+                               Alert.alert("예약 작성을 완료해주세요.")
                            }
                 
                        }}
@@ -220,12 +263,14 @@ export default function ReservationOrganism({info}) {
 
 const styles = StyleSheet.create({
     personBtn: {
-        // backgroundColor: "rgb(6,6,72)",
         width: 30,
         alignItems: "center",
         justifyContent: "center",
         borderWidth: 1,
         borderColor: "#BFBFBF"
+    },
+    timeBtn:{
+    
     }
 })
 

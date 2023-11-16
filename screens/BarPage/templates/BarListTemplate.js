@@ -1,24 +1,50 @@
-import {Image, Pressable, ScrollView, Text, View} from "react-native";
-import barImg from "../../../assets/img/barImgSample.png";
+import {Alert, Image, Pressable, ScrollView, Text, View} from "react-native";
 import barBanner from "../../../assets/img/sampleBar.png"
-
+import likeBtn from "../../../assets/img/heart.png"
+import likeBtnClicked from "../../../assets/img/heartClicked.png"
+import {UserInfo} from "../../../components/recoil/LoginStore";
+import {useRecoilValue} from "recoil";
+import {useCallback, useEffect, useState} from "react";
+import axios from "axios";
+import {useFocusEffect} from "@react-navigation/native";
+import star from "../../../assets/img/ratingStar.png"
 
 export default function BarListTemplate({mapList, setClickedCenterId, setCenterOfMap}) {
+    const userInfo = useRecoilValue(UserInfo);
+    const [bookmarkList, setBookmarkList] = useState([]);
+    
+    const onClickLike = async (id) => {
+        await axios.post(`http://localhost:8080/bar/bookmark/${id}`,{userID: userInfo.userID});
+        if(bookmarkList.includes(id)){
+            Alert.alert("찜목에서 취소되었습니다.")
+        }
+        else{
+            Alert.alert("찜목록에 추가되었습니다.")
+        }
+        await axios.get(`http://localhost:8080/bar/bookmark/${userInfo.userID}`)
+        .then(res => setBookmarkList(res.data.bookmarkList));
+    }
+    
+    useFocusEffect(
+        useCallback(()=>{
+        axios.get(`http://localhost:8080/bar/bookmark/${userInfo.userID}`)
+            .then(res => setBookmarkList(res.data.bookmarkList));
+    },[]));
     
     
     return (
-            <ScrollView>
+        <ScrollView>
             {
                 mapList &&
                 mapList.map((item) => (
                     
                     <Pressable key={item.barID}
-                        style={({pressed}) => ({
-                        opacity: pressed ? 0.5 : 1,
-                        justifyContent: 'center',
-                        alignItems: "center",
-                        borderBottomWidth: 3, borderBottomStyle: 'solid', borderBottomColor: '#F8F8F8',
-                    })}
+                               style={({pressed}) => ({
+                                   opacity: pressed ? 0.5 : 1,
+                                   justifyContent: 'center',
+                                   alignItems: "center",
+                                   borderBottomWidth: 3, borderBottomStyle: 'solid', borderBottomColor: '#F8F8F8',
+                               })}
                                onPress={() => {
                                    setClickedCenterId(item.barID);
                                    setCenterOfMap({lat: item.barLatitude, lng: item.barLongitude})
@@ -48,11 +74,21 @@ export default function BarListTemplate({mapList, setClickedCenterId, setCenterO
                                     opacity: 0.7,
                                     marginVertical: 6
                                 }}>{item.barAddress}</Text>
-                                <Text style={{
-                                    color: "rgba(251, 128, 39, 0.83)",
-                                    fontSize: 12
-                                }}>#바 #펍</Text>
+                                
+                                <View style={{flexDirection:"row", alignItems: "center"}}>
+                                    <Image source={star} />
+                                    <Text style={{
+                                        marginLeft:3,
+                                        fontSize: 12
+                                    }}>{item.barStarAverage ? item.barStarAverage.toFixed(1) : 0 }</Text>
+                                </View>
+                             
                             </View>
+                            <Pressable style={{marginLeft: "auto"}}
+                                       onPress={()=>onClickLike(item.barID)}
+                            >
+                                <Image source={bookmarkList.includes(item.barID) ? likeBtnClicked : likeBtn}/>
+                            </Pressable>
                         </View>
                     </Pressable>
                 ))

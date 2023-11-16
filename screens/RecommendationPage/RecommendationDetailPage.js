@@ -6,18 +6,20 @@ import {
     useWindowDimensions,
     ScrollView,
     ActivityIndicator,
-    StyleSheet
+    StyleSheet, Alert
 } from 'react-native';
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import backBtn from "../../assets/img/backBtn.png";
 import whiskeyDetail1 from "../../assets/img/whiskeyDetail1.png";
 import likeBtn from "../../assets/img/heart.png";
 import {colors} from "../../components/common/style/colors";
-import trash from "../../assets/img/trash.png"
 import axios from "axios";
 import likeBtnClicked from "../../assets/img/heartClicked.png"
 import {UserInfo} from "../../components/recoil/LoginStore";
 import {useRecoilValue} from "recoil";
+import {useFocusEffect} from "@react-navigation/native";
+import {Rating} from "react-native-ratings";
+import star from "../../assets/img/reviewStar.png";
 
 
 export default function RecommendationDetailPage({navigation, route}) {
@@ -28,13 +30,17 @@ export default function RecommendationDetailPage({navigation, route}) {
     
     const onClickHeart = async () => {
         await axios.post(`http://localhost:8080/liquor/bookmark/${route.params.id}`, {
-            userID:99
-        });
-        axios.get(`http://localhost:8080/liquor/bookmark/${userInfo.userID}`).then(res =>
-            res.data.includes(route.params.id) ?
-                setIsLiked(true)
-                :
-                setIsLiked(false)
+            userID: userInfo.userID
+        })
+        axios.get(`http://localhost:8080/liquor/bookmark/${userInfo.userID}`).then(res => {
+                if (res.data.includes(route.params.id)) {
+                    setIsLiked(true);
+                    Alert.alert("찜목록에 추가되었습니다.")
+                } else {
+                    setIsLiked(false);
+                    Alert.alert("찜목록에서 제거되었습니다.")
+                }
+            }
         );
     }
     console.log(userInfo);
@@ -52,17 +58,18 @@ export default function RecommendationDetailPage({navigation, route}) {
         });
     }, []);
     
-    useEffect(() => {
-        axios.get(`http://localhost:8080/liquor/info/${route.params.id}`).then(res =>
-            setLiquorInfo(res.data)
-        );
-        axios.get(`http://localhost:8080/liquor/bookmark/${userInfo.userID}`).then(res =>
-            res.data.includes(route.params.id) ?
-                setIsLiked(true)
-                :
-                setIsLiked(false)
-        );
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            axios.get(`http://localhost:8080/liquor/info/${route.params.id}`).then(res =>
+                setLiquorInfo(res.data[0])
+            );
+            axios.get(`http://localhost:8080/liquor/bookmark/${userInfo.userID}`).then(res =>
+                res.data.includes(route.params.id) ?
+                    setIsLiked(true)
+                    :
+                    setIsLiked(false)
+            );
+        }, []));
     
     
     return (
@@ -85,61 +92,43 @@ export default function RecommendationDetailPage({navigation, route}) {
                                     <Text style={{opacity: 0.5, fontSize: 17, fontWeight: 400}}>
                                         {liquorInfo.liquorType}
                                     </Text>
-                                    <Text style={{fontSize: 18, color: colors.darkGrey}}>
+                                    <Text style={{fontSize: 18, color: colors.darkGrey, width: "80%"}}>
                                         {liquorInfo.liquorName}
                                     </Text>
                                 </View>
                                 <Pressable style={{marginLeft: 'auto'}} onPress={onClickHeart}>
-                                    <Image  source={isLiked ? likeBtnClicked : likeBtn}/>
+                                    <Image source={isLiked ? likeBtnClicked : likeBtn}/>
                                 </Pressable>
                             </View>
                             <View style={{marginTop: 24}}>
                                 <Text style={{color: colors.darkGrey, fontSize: 20, fontWeight: 900}}>
                                     $ {liquorInfo.liquorPrice}
                                 </Text>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Image source={trash}/>
+                                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                                    <Rating type={"custom"}
+                                            ratingColor= {colors.mainOrange}
+                                            imageSize={16}
+                                            readonly={true}
+                                            fractions={1}
+                                            startingValue={liquorInfo.averageLiquorStar}
+                                    />
                                     <Text style={{
                                         color: colors.darkGrey,
                                         marginLeft: 3,
                                         marginRight: 10,
                                         fontSize: 15,
                                         fontWeight: 500
-                                    }}>3.5</Text>
+                                    }}>{liquorInfo.averageLiquorStar ? liquorInfo.averageLiquorStar.toFixed(1) : 0}</Text>
                                     <Text style={{
                                         color: 'rgba(71, 67, 72, 0.7)',
                                         fontSize: 12,
                                         textDecorationLine: 'underline'
-                                    }}>리뷰(30)</Text>
+                                    }}>{`리뷰(${liquorInfo.liquorReview.length})`}</Text>
                                 </View>
                             </View>
                             {/*<Image style={{marginTop: 10, width: windowWidth}} source={melonAD}/>*/}
-                            <View style={{
-                                justifyContent: 'center',
-                                height: 90,
-                                backgroundColor: '#F6F9FE',
-                                borderRadius: 10,
-                                shadowOffset: {width: 0, height: 0},
-                                shadowColor: "#000",
-                                shadowOpacity: 0.07,
-                                shadowRadius: 5,
-                                elevation: 1,
-                                marginTop: 10,
-                            }}>
-                                <Text style={{color: colors.darkGrey, fontSize: 18, fontWeight: 700, marginLeft: 14}}>2023
-                                    멜론 뮤직
-                                    어워드</Text>
-                                <Text style={{
-                                    color: 'rgba(71, 67, 72, 0.5)',
-                                    fontSize: 18,
-                                    fontWeight: 700,
-                                    marginLeft: 14,
-                                    marginTop: 3
-                                }}>카카오와 함께하는 MMA</Text>
-                            </View>
                             <Text style={styles.subtitle}>IMFORMATION</Text>
                             <View style={{
-                                height: 155,
                                 backgroundColor: '#F6F9FE',
                                 borderRadius: 10,
                                 shadowOffset: {width: 0, height: 0},
@@ -147,56 +136,63 @@ export default function RecommendationDetailPage({navigation, route}) {
                                 shadowOpacity: 0.07,
                                 shadowRadius: 5,
                                 elevation: 1,
+                                marginBottom: 10
                             }}>
                                 <View style={{flex: 1, margin: 10}}>
-                                    <View style={{flex: 1, flexDirection: "row",}}>
-                                        <Text style={{
-                                            flex: 1,
-                                            fontSize: 17,
-                                            fontWeight: 500,
-                                            color: colors.darkGrey,
-                                            opacity: 0.7
-                                        }}>향의 강도</Text>
-                                        <View style={{
-                                            flex: 1,
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between'
-                                        }}>
-                                            <Circle color={colors.mainOrange} text={'약함'}/>
-                                            <Circle color={'rgba(71,67,72,0.5)'} text={'보통'}/>
-                                            <Circle color={'rgba(71,67,72,0.5)'} text={'강함'}/>
+                                    <Text style={{fontSize: 15, color: colors.darkGrey}}>
+                                        {liquorInfo.liquorDetail}...
+                                    </Text>
+                                </View>
+                            </View>
+                        
+                        </View>
+                        <View style={{height: 7, backgroundColor: '#F8F8F8', marginTop: 10}}/>
+                        
+                        <View>
+                            <View style={{alignItems: "center", marginTop: 23, marginBottom: 20}}>
+                                <Text style={styles.starText}>{liquorInfo.averageLiquorStar ? liquorInfo.averageLiquorStar.toFixed(1) : 0}</Text>
+                                <Rating type="custom"
+                                        ratingColor={"#FFC008"}
+                                        imageSize={24}
+                                        readonly={true}
+                                        fractions={1}
+                                        startingValue={liquorInfo.averageLiquorStar}
+                                />
+                                <Text style={{color: "#888", fontSize: 12, marginTop: 10}}>1개의 리뷰</Text>
+                            </View>
+                            
+                            <View style={{width: "100%", height: 5, backgroundColor: "#F8F8F8"}}/>
+                            
+                            
+                            {
+                                liquorInfo.liquorReview.map((item, i) => (
+                                    <View key={i} style={styles.reviewEntry}>
+                                        
+                                        <View style={styles.reviewBox}>
+                                            <Text
+                                                style={{color: "#BFBFBF", fontWeight: "700"}}>{item.userNickname}</Text>
+                                            <Text style={{opacity: 0.5}}>{item.liquorReviewTime.slice(0,10)}</Text>
                                         </View>
-                                    </View>
-                                    <View style={{flex: 1, flexDirection: 'row'}}>
-                                        <Text style={{
-                                            flex: 1,
-                                            fontSize: 17,
-                                            fontWeight: 500,
-                                            color: colors.darkGrey,
-                                            opacity: 0.7
-                                        }}>바디감</Text>
-                                        <View style={{
-                                            flex: 1,
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between'
-                                        }}>
-                                            <Circle color={'rgba(71,67,72,0.5)'} text={'약함'}/>
-                                            <Circle color={colors.mainOrange} text={'보통'}/>
-                                            <Circle color={'rgba(71,67,72,0.5)'} text={'강함'}/>
+                                        
+                                        
+                                        <View style={styles.reviewBox}>
+                                            <Text style={{
+                                                color: colors.darkGrey,
+                                                fontSize: 16,
+                                                fontWeight: "500"
+                                            }}>{item.liquorReviewDetail}</Text>
+                                            <View style={{flexDirection: "row", alignItems: "center"}}>
+                                                <Image source={star}/>
+                                                <Text style={styles.starText}>{item.liquorStar}</Text>
+                                            </View>
                                         </View>
                                     
                                     </View>
-                                </View>
-                            </View>
-                            <Text style={styles.subtitle}>DETAIL</Text>
-                            <Text style={{fontSize: 15, color: colors.darkGrey}}>
-                                {liquorInfo.liquorDetail}
-                            </Text>
+                                ))
+                            }
+                        
+                        
                         </View>
-                        <View style={{height: 5, backgroundColor: '#F8F8F8', marginTop: 10}}/>
-                    
                     </ScrollView>
             }
         
@@ -236,11 +232,31 @@ const Circle = (props) => {
 
 
 const styles = StyleSheet.create({
-    subtitle:{
+    subtitle: {
         color: colors.darkGrey,
         fontSize: 15,
         fontWeight: 700,
         marginTop: 18,
         marginBottom: 10
+    },
+    starText: {
+        color: "#FFC008",
+        fontSize: 18,
+        fontWeight: "700"
+    },
+    reviewEntry: {
+        height: 90,
+        borderBottomWidth: 2,
+        borderBottomColor: "#F8F8F8",
+        paddingHorizontal: 18,
+        paddingTop: 17,
+        paddingBottom: 14,
+        justifyContent: "space-between"
+    },
+    reviewBox: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        
     }
 })
