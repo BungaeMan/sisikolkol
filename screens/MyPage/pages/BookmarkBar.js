@@ -20,6 +20,8 @@ import {useRecoilValue} from "recoil";
 import {UserInfo} from "../../../components/recoil/LoginStore";
 import Modal from "react-native-modal";
 import BarInfoTemplate from "../../BarPage/templates/BarInfoTemplate";
+import {barPath, liquorPath} from "../../../components/common/style/photo";
+
 
 export default function BookmarkBar({navigation}) {
     const [bookmarkList, setBookmarkList] = useState([]);
@@ -42,8 +44,8 @@ export default function BookmarkBar({navigation}) {
                 {
                     text: "삭제",
                     onPress: async () => {
-                        await axios.post(`http://localhost:8080/bar/bookmark/${id}`, {userID: userInfo.userID});
-                        await axios.get(`http://localhost:8080/bar/bookmark/${userInfo.userID}`).then(res => setBookmarkList(res.data.bookmarkList));
+                        await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/bar/bookmark/${id}`, {userID: userInfo.userID});
+                        await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/bookmark/${userInfo.userID}`).then(res => setBookmarkList(res.data.bookmarkList));
                         setInfos([]);
                         setLoading(true);
                         setTimeout(() => {
@@ -74,7 +76,7 @@ export default function BookmarkBar({navigation}) {
     }, []);
     
     useEffect(() => {
-        axios.get(`http://localhost:8080/bar/bookmark/${userInfo.userID}`)
+        axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/bookmark/${userInfo.userID}`)
         .then(res => setBookmarkList(res.data.bookmarkList));
         setInfos([]);
         setLoading(false);
@@ -82,7 +84,7 @@ export default function BookmarkBar({navigation}) {
     
     useEffect(() => {
         if (!bookmarkList.length) return;
-        bookmarkList.forEach(item => axios.get(`http://localhost:8080/bar/info/${item}`)
+        bookmarkList.forEach(item => axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/info/${item}`)
         .then(res => setInfos(cur => [...cur, res.data[0]])));
     }, [bookmarkList])
     
@@ -113,13 +115,16 @@ export default function BookmarkBar({navigation}) {
                                         setIsOpen(true);
                                     }}
                                 >
-                                    <View style={{width: 80, height: 80, backgroundColor: "red", borderRadius: 10}}/>
+                                    <View style={{width: 80, height: 80, backgroundColor: colors.darkGrey4, borderRadius: 10, alignItems: "center", justifyContent: "center"}}
+                                    >
+                                        <Image source={{uri: barPath(item.barID - 432)}} style={{width: 80, height: 80, borderRadius: 10}}/>
+                                    </View>
                                     <View style={{paddingVertical: 5, marginLeft: 10}}>
                                         <Text style={styles.title}>{item.barName}</Text>
                                         <Text style={styles.price}>{item.barAddress}</Text>
                                         <View style={{flexDirection: "row", alignItems: "center"}}>
                                             <Image source={star}/>
-                                            <Text style={{marginLeft: 3}}>{item.barStarAverage ? item.barStarAverage : 0}</Text>
+                                            <Text style={{marginLeft: 3}}>{item.barStarAverage ? item.barStarAverage.toFixed(1) : 0}</Text>
                                         </View>
                                         {/*<Text style={styles.rating}>review</Text>*/}
                                     </View>
@@ -133,7 +138,10 @@ export default function BookmarkBar({navigation}) {
                 }
             </View>
             {
-                <Modal isVisible={isOpen} onBackdropPress={()=>setIsOpen(false)}>
+                <Modal isVisible={isOpen} onBackdropPress={()=> {
+                    setIsOpen(false);
+                    setClickedCenterID(null);
+                }}>
                     <SafeAreaView style={{...styles.modalContainer, width: windowWidth.width, height: windowWidth.height - 150}}>
                         <View style={{width: "100%", height: 30, justifyContent: "center", alignItems: "center"}}
                               onMoveShouldSetResponder={(evt) => true}

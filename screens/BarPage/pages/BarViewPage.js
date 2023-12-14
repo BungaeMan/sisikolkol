@@ -69,15 +69,15 @@ export default function BarViewPage() {
     const handleSearch = async () => {
         try {
             if (searchText === "") {
-                axios.get(`http://localhost:8080/bar/coordinate`).then(res => setMapList(res.data));
+                axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/coordinate`).then(res => setMapList(res.data));
             } else {
-                await axios.get(`http://localhost:8080/bar/search/${searchText}`)
+                await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/search/${searchText}`)
                 .then(res => setMapList(res.data));
             }
             
             
         } catch (err) {
-            Alert.alert("가게 정보를 찾을 수 없습니다.");
+            Alert.alert(err.response.data.error);
             console.log(err);
         }
     }
@@ -124,7 +124,7 @@ export default function BarViewPage() {
     
     useFocusEffect(
         useCallback(() => {
-            axios.get(`http://localhost:8080/bar/coordinate`).then(res => setMapList(res.data));
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/coordinate`).then(res => setMapList(res.data));
         }, []));
     
     console.log(searchText);

@@ -10,15 +10,15 @@ import {
     SafeAreaView, Alert
 } from 'react-native';
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import backBtn from "../../../assets/img/backBtn.png";
 import {colors} from "../../../components/common/style/colors";
-import barImg from "../../../assets/img/sampleBar.png"
 import axios from "axios";
 import {useRecoilValue} from "recoil";
 import {UserInfo} from "../../../components/recoil/LoginStore";
 import Modal from "react-native-modal";
 import {Rating} from "react-native-ratings";
+import {barPath} from "../../../components/common/style/photo";
 
 export default function ReservationPage(props) {
     const navigation = useNavigation();
@@ -31,6 +31,7 @@ export default function ReservationPage(props) {
     const [reviewStar, setReviewStar] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
     const [finish, setFinish] = useState([]);
+    const [trigger, setTrigger] = useState(false);
     
     const onPressReview = async () => {
         if (reviewText.length === 0 || !reviewStar) {
@@ -39,7 +40,7 @@ export default function ReservationPage(props) {
         }
         
         try {
-            await axios.post(`http://localhost:8080/bar/review/${clickedID}`, {
+            await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/bar/review/${clickedID}`, {
                 userNickname: userInfo.userNickname,
                 barStar: reviewStar,
                 barReviewDetail: reviewText
@@ -51,6 +52,33 @@ export default function ReservationPage(props) {
         } catch (err) {
             Alert.alert(err.response.data.error);
         }
+    }
+    
+    const onPressCancel = async (reservationID) => {
+        
+        Alert.alert(
+            "취소하시겠습니까?",
+            null,
+            [{
+                text: "취소",
+                style: "cancel"
+            },
+                {
+                    text: "확인",
+                    onPress: async () => {
+                        await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/bar/reservation/cancel/${reservationID}`,{
+                            userID: userInfo.userID
+                        })
+                        .then(res => {
+                            Alert.alert("취소되었습니다.");
+                            setTrigger(cur => !cur);
+                        })
+                        .catch(err => Alert.alert(err.response.data.error))
+                    }
+                }
+            
+            ]
+        )
     }
     
     
@@ -69,27 +97,24 @@ export default function ReservationPage(props) {
         });
     }, []);
     
-    useEffect(() => {
-        axios.get(`http://localhost:8080/bar/reservation/${userInfo.userID}`)
-        .then(res => {
-            setInfos(res.data);
-            res.data.forEach(item => {
-                const target = new Date(item.reservationTime);
-                const now = new Date();
-                //지난 예약이면 false
-                setFinish(cur => [...cur, now < target]);
+    useFocusEffect(
+        useCallback(() => {
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/reservation/${userInfo.userID}`)
+            .then(res => {
+                setInfos(res.data);
+                
+                const tmp = res.data.map(item => {
+                    const target = new Date(item.reservationTime);
+                    const now = new Date();
+                    //지난 예약이면 false
+                    return target > now;
+                })
+                setFinish(tmp);
             })
-        })
-        
-    }, []);
+            
+        }, [trigger]));
     
     
-    const dateString = '2023-11-10 23:00';
-    const date = new Date(dateString);
-    const now = new Date();
-    console.log(date < now);
-    
-    // console.log(infos.reservationTime[0])
     return (
         <ScrollView style={{flex: 1, backgroundColor: "white"}}>
             <View style={{
@@ -124,7 +149,7 @@ export default function ReservationPage(props) {
                                         <Text style={styles.largeText}>{item.reservationNum}</Text>
                                     </View>
                                 </View>
-                                <Image source={barImg} style={{width: 70, height: 70}}/>
+                                <Image source={{uri: barPath(item.barID - 432)}} style={{width: 70, height: 70, borderRadius:10}}/>
                             </View>
                             <View style={{alignItems: "center", justifyContent: "center", marginTop: 20}}>
                                 <Pressable style={{
@@ -136,10 +161,13 @@ export default function ReservationPage(props) {
                                     borderRadius: 10
                                 }}
                                            onPress={() => {
-                                               if(!finish[i]){
+                                               if (!finish[i]) {
                                                    setIsOpen(true);
                                                    setClickedID(item.barID);
                                                    setClickedName(item.barName);
+                                               }
+                                               else{
+                                                   onPressCancel(item.reservationID);
                                                }
                                            }}
                                 >

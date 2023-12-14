@@ -19,7 +19,7 @@ export default function LoginPage() {
     const onClickLogin = async (text) => {
         
         try {
-            await axios.post(`http://localhost:8080/login`,{loginID: loginID, loginPW:loginPW},
+            await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/login`,{loginID: loginID, loginPW:loginPW},
                 {
                     headers: {
                         "Content-Type": "application/json"
@@ -29,7 +29,9 @@ export default function LoginPage() {
                 setUserInfo(res.data);
                 console.log(res.data)
             })
-            
+    
+            setLoginID("");
+            setLoginPW("");
             navigation.navigate("Root");
             Alert.alert("로그인 성공");
         } catch (err) {

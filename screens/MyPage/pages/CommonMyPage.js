@@ -14,13 +14,16 @@ export default function CommonMyPage(props) {
     const userInfo = useRecoilValue(UserInfo);
     const [reviewList, setReviewList] = useState(null);
     const [barReviewList, setBarReviewList] = useState(null);
+    const [reservationNum, setReservationNum] = useState(null);
     
     useFocusEffect(
         useCallback(() => {
-            axios.get(`http://localhost:8080/liquor/review/${userInfo.userNickname}`)
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/review/${userInfo.userNickname}`)
             .then(res => setReviewList(res.data.reviews));
-            axios.get(`http://localhost:8080/bar/review/${userInfo.userNickname}`)
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/review/${userInfo.userNickname}`)
             .then(res => setBarReviewList(res.data.reviewedBars));
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/reservation/${userInfo.userID}`)
+            .then(res => setReservationNum(res.data.length))
         }, []));
     
     
@@ -50,7 +53,8 @@ export default function CommonMyPage(props) {
         <SafeAreaView style={{flex: 1, backgroundColor: "white"}}>
             <View style={{flex: 1, backgroundColor: "white", paddingTop: 30}}>
                 <View style={{flexDirection: "row", alignItems: "center", paddingHorizontal: 18,}}>
-                    <Text style={{color: colors.darkGrey, fontWeight: "700", fontSize: 18, marginRight: 7}}>홍길동</Text>
+                    <Text style={{color: colors.darkGrey, fontWeight: "700", fontSize: 18, marginRight: 7}}>
+                        {userInfo.userNickname}</Text>
                     <Image source={nextArrow}/>
                 </View>
                 <View style={{
@@ -65,8 +69,8 @@ export default function CommonMyPage(props) {
                     marginHorizontal: 18
                 }}>
                     <View style={{alignItems: "center"}}>
-                        <Text style={styles.title}>리뷰</Text>
-                        <Text style={styles.content}>10</Text>
+                        <Text style={styles.title}>예약 내역</Text>
+                        <Text style={styles.content}>{reservationNum}</Text>
                     </View>
                     <View style={{alignItems: "center"}}>
                         <Text style={styles.title}>주류 리뷰</Text>
@@ -107,6 +111,18 @@ export default function CommonMyPage(props) {
                         <Text style={styles.rowTitle}>내가 찜한 가게</Text>
                         <Image source={nextArrow} style={{marginLeft: "auto"}}/>
                     </Pressable>
+    
+                    {
+                        userInfo.auth &&
+                        <Pressable onPress={() => props.navigation.navigate("Manage")}
+                                   style={{flexDirection: "row", alignItems: "center", paddingTop: 16,
+                                       borderTopWidth: 0.5, borderColor: "rgba(0,0,0,0.3)", marginTop:18}}>
+                            <Text style={styles.rowTitle}>가게 예약 관리</Text>
+                            <Image source={nextArrow} style={{marginLeft: "auto"}}/>
+                        </Pressable>
+                        
+                    }
+                    
                 
                 </View>
                 <View style={{backgroundColor: "#DFDFDF", height: 7, marginTop: 20}}/>
@@ -130,12 +146,11 @@ export default function CommonMyPage(props) {
                     </Pressable>
                 </View>
                 
-                <View style={{marginTop: 40, paddingHorizontal: 18}}>
-                    <Text style={styles.underText}>비밀번호 변경</Text>
+                <View style={{marginTop: 20, paddingHorizontal: 18}}>
                     <Pressable onPress={logOut}>
                         <Text style={{...styles.underText, marginVertical: 15}}>로그아웃</Text>
                     </Pressable>
-                    <Text style={styles.underText}>계정탈퇴</Text>
+                    {/*<Text style={styles.underText}>계정탈퇴</Text>*/}
                 
                 </View>
             </View>

@@ -231,7 +231,7 @@ export default function ReservationOrganism({info, setFlag}) {
             })}
                        onPress={async () => {
                            if (selectedTime && selectedDate && peopleNum) {
-                               await axios.post(`http://localhost:8080/bar/reservation/${info.barID}`,{
+                               await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/bar/reservation/${info.barID}`,{
                                    userID: userInfo.userID,
                                    reservationTime: selectedDate + ' ' + selectedTime,
                                    reservationNum: peopleNum

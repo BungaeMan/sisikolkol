@@ -18,7 +18,7 @@ export default function RecommendationWhisky() {
     const [liquorList, setLiquorList] = useState(null);
     
     useEffect(() => {
-        axios.get("http://localhost:8080/liquor/info").then(res => setLiquorList(res.data))
+        axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/info`).then(res => setLiquorList(res.data))
     }, [])
     
     return (

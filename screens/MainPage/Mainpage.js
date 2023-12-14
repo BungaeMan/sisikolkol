@@ -1,34 +1,61 @@
 import {View, Text, StyleSheet, Image, ScrollView, Pressable, useWindowDimensions} from "react-native"
-import React, {useState} from "react"
+import React, {useCallback, useState} from "react"
 import {SafeAreaView, SafeAreaProvider} from "react-native-safe-area-context";
-import bannerImg from "../../assets/img/bannerImg1.png";
+import bannerImg from "../../assets/img/bowmore.jpeg";
 import {colors} from "../../components/common/style/colors";
 import plusBtn from "../../assets/img/plusBtn.png";
-import whiskey1 from "../../assets/img/whiskey1.png";
 import star from "../../assets/img/mainPageStar.png"
-import {useNavigation} from "@react-navigation/native";
-import ReservationModal from "../BarPage/ReservationModal";
-import {useRecoilState} from "recoil";
-import {ReservationStatus} from "../../components/recoil/reservation";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
+import {useRecoilState, useRecoilValue} from "recoil";
 import barBanner from "../../assets/img/sampleBar.png"
 import axios from "axios";
-export default function MainPage() {
-    const windowWidth = useWindowDimensions().width;
-    const navigation = useNavigation();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isReserved, setIsReserved] = useState(false);
-    const [status, setStatus] = useRecoilState(ReservationStatus);
+import {UserInfo} from "../../components/recoil/LoginStore";
+import {liquorPath, barPath} from "../../components/common/style/photo";
+import Modal from "react-native-modal";
+import BarInfoTemplate from "../BarPage/templates/BarInfoTemplate";
+
+
+export default function MainPage({navigation}) {
+    const windowWidth = useWindowDimensions();
+    const userInfo = useRecoilValue(UserInfo);
+    const [reservation, setReservation] = useState(null);
+    const [liquorList, setLiquorList] = useState(null);
+    const [barList, setBarList] = useState(null);
+    const [clickedID, setClickedID] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
     
+    useFocusEffect(
+        useCallback(() => {
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/reservation/${userInfo.userID}`).then(res => {
+                const reverse = [...res.data].reverse();
+                const tmp = reverse.find(item => {
+                    const target = new Date(item.reservationTime);
+                    const now = new Date();
+                    
+                    return target > now
+                })
+                setReservation(tmp);
+            });
+            
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/recommendation`).then(res => setLiquorList(res.data))
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/recommendation`).then(res => setBarList(res.data))
+            
+        }, [])
+    )
     
+    console.log(reservation)
     return (
         <>
             <ScrollView showsVerticalScrollIndicator={false} style={{backgroundColor: "white", flex: 1}}>
                 <SafeAreaView>
-                    {/*<ScrollView style={{height:100}}horizontal={true} showsHorizontalScrollIndicator={false}>*/}
-                    <View style={styles.container}>
-                        <Image source={bannerImg} style={{width: "100%"}}/>
-                    </View>
-                    {/*</ScrollView>*/}
+                    <Pressable style={styles.container}
+                               onPress ={() => navigation.navigate("Recommendation", {
+                                   id: 2
+                               })}
+                               
+                    >
+                        <Image source={bannerImg} style={{width: windowWidth.width + 10, height: 300}}/>
+                    </Pressable>
                     <View>
                         <View style={{marginTop: 28, paddingHorizontal: 18}}>
                             <Text style={{color: colors.darkGrey, fontSize: 16, fontWeight: 700}}>예약 현황</Text>
@@ -50,7 +77,7 @@ export default function MainPage() {
                                 borderRadius: 10,
                                 marginTop: 10
                             }}>
-                            {status.id ?
+                            {reservation ?
                                 <Pressable style={{
                                     flexDirection: "row",
                                     alignItems: "center",
@@ -58,22 +85,20 @@ export default function MainPage() {
                                     width: "100%",
                                     padding: 15
                                 }}
-                                           onPress={() => {
-                                               setIsModalOpen(true);
-                                           }}
+                                           onPress={() => navigation.navigate("MyPageStack", {screen: "Reservation"})}
                                 >
                                     <View style={{marginLeft: 10}}>
                                         <Text style={{
                                             color: colors.darkGrey,
                                             fontSize: 18,
                                             fontWeight: "700"
-                                        }}>{status.time} 예약</Text>
-                                        <Text style={{opacity: 0.5, marginTop: 2}}>{status.name}</Text>
+                                        }}>{reservation.reservationTime.slice(11,17)} 예약</Text>
+                                        <Text style={{opacity: 0.5, marginTop: 5}}>{reservation.barName}</Text>
                                     </View>
-                                    <Image style={{width: 90, height: 90, borderRadius: 10}} source={barBanner}/>
+                                    <Image style={{width: 90, height: 90, borderRadius: 10}} source={{uri: barPath(reservation.barID - 432)}}/>
                                 </Pressable>
                                 :
-                                <Pressable onPress={()=>navigation.navigate("BarStack", {screen: "BarPage"})}>
+                                <Pressable onPress={() => navigation.navigate("BarStack", {screen: "BarPage"})}>
                                     <Text style={{fontSize: 10, opacity: 0.5, fontWeight: 500, textAlign: 'center'}}>
                                         예약된 정보가 없습니다.</Text>
                                     <View style={{
@@ -95,83 +120,90 @@ export default function MainPage() {
                         </View>
                         {/*주류픽!*/}
                         <View style={{marginTop: 70, paddingHorizontal: 18}}>
-                            <Text style={{color: colors.darkGrey, fontSize: 16, fontWeight: 700}}>오늘의 주류 PICK</Text>
-                            <Text style={{opacity: 0.3, fontSize: 10, fontWeight: 400, marginTop: 3}}>다양한 주류를
+                            <View style={{flexDirection: "row", alignItems: "center"}}>
+    
+                                <Text style={{color: colors.darkGrey, fontSize: 16, fontWeight: 700}}>LIQUOR </Text>
+                                <Text style={{color: colors.mainOrange, fontSize: 16, fontWeight: 700}}>RANK</Text>
+                            </View>
+                            <Text style={{opacity: 0.3, fontSize: 10, fontWeight: 400, marginTop: 3}}>가장 많이 찜한 주류를
                                 만나보세요.</Text>
                         </View>
                         <ScrollView horizontal={true} style={{marginTop: 9}} showsHorizontalScrollIndicator={false}>
-                            <Pressable
-                                onPress={() => {
-                                    navigation.navigate("Recommendation")
-                                }}
-                                style={{paddingHorizontal: 18}}>
-                                <View style={{
-                                    width: 180,
-                                    height: 130,
-                                    backgroundColor: "rgb(248,246,253)",
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }}>
-                                    <Image source={whiskey1}/>
-                                
-                                </View>
-                                <View style={{flexDirection: "row", marginTop: 7, alignItems: 'center',}}>
-                                    <Text style={{color: colors.darkGrey, fontSize: 12, fontWeight: 400}}>[박근우 픽] 잭 다니엘
-                                        99년산</Text>
-                                    <View style={{
-                                        width: 24,
-                                        height: 12,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        backgroundColor: "#F57171",
-                                        marginLeft: 3
-                                    }}>
-                                        <Text style={{color: "white", fontSize: 9, fontWeight: 700}}>추천</Text>
-                                    </View>
-                                </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center',}}>
-                                    <Image source={star}/>
-                                    <Text style={{marginLeft: 3, marginRight: 5, fontSize: 10}}>5.0</Text>
-                                    <Text style={{color: colors.mainOrange, fontSize: 10}}>#향 강함 #바디감 약함</Text>
-                                </View>
-                            </Pressable>
-                            {/*중복*/}
-                            <Pressable
-                                onPress={() => {
-                                    navigation.navigate("Recommendation")
-                                }}
-                            >
-                                <View style={{
-                                    width: 180,
-                                    height: 130,
-                                    backgroundColor: "rgb(248,246,253)",
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }}>
-                                    <Image source={whiskey1}/>
-                                
-                                </View>
-                                <View style={{flexDirection: "row", marginTop: 7, alignItems: 'center'}}>
-                                    <Text style={{color: colors.darkGrey, fontSize: 12, fontWeight: 400}}>[박근우 픽] 잭 다니엘
-                                        99년산</Text>
-                                    <View style={{
-                                        width: 24,
-                                        height: 12,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        backgroundColor: "#F57171",
-                                        marginLeft: 3
-                                    }}>
-                                        <Text style={{color: "white", fontSize: 9, fontWeight: 700}}>추천</Text>
-                                    </View>
-                                </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Image source={star}/>
-                                    <Text style={{marginLeft: 3, marginRight: 5, fontSize: 10}}>5.0</Text>
-                                    <Text style={{color: colors.mainOrange, fontSize: 10}}>#향 강함 #바디감 약함</Text>
-                                </View>
-                            </Pressable>
-                        
+                            {
+                                liquorList &&
+                                liquorList.map((item, i) =>
+                                    <Pressable key={item.liquorID}
+                                        onPress={() => {
+                                            navigation.navigate("Recommendation",  {id: item.liquorID})
+                                        }}
+                                        style={{paddingHorizontal: 18}}>
+                                        <View style={{
+                                            width: 180,
+                                            height: 130,
+                                            backgroundColor: colors.darkGrey4,
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            borderRadius: 10
+                                        }}>
+                                            <Image style={{width: 90, height: 100}}
+                                                source={{uri: liquorPath(item.liquorID)}}/>
+        
+                                        </View>
+                                        <View style={{flexDirection: "row", marginTop: 7, alignItems: 'center',}}>
+                                            <Text style={{color: colors.darkGrey, fontSize: 12, fontWeight: 500, width: 170}}>{item.liquorName}</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', alignItems: 'center', marginTop:5}}>
+                                            <Image source={star}/>
+                                            <Text style={{marginLeft: 3, marginRight: 5, fontSize: 10}}>{item.averageStar ? item.averageStar.toFixed(1) : 0}</Text>
+                                            <Text style={{color: colors.mainOrange, fontSize: 10, fontWeight: "500"}}>{`RANK ${i+1}`}</Text>
+                                        </View>
+                                    </Pressable>
+                                )
+                            }
+                        </ScrollView>
+    
+                        {/*가게픽!*/}
+                        <View style={{marginTop: 50, paddingHorizontal: 18}}>
+                            <View style={{flexDirection: "row", alignItems: "center"}}>
+            
+                                <Text style={{color: colors.darkGrey, fontSize: 16, fontWeight: 700}}>BAR </Text>
+                                <Text style={{color: colors.mainOrange, fontSize: 16, fontWeight: 700}}>RANK</Text>
+                            </View>
+                            <Text style={{opacity: 0.3, fontSize: 10, fontWeight: 400, marginTop: 3}}>가장 많이 찜한 가게를
+                                예약해보세요..</Text>
+                        </View>
+                        <ScrollView horizontal={true} style={{marginTop: 9}} showsHorizontalScrollIndicator={false}>
+                            {
+                                barList &&
+                                barList.map((item, i) =>
+                                    <Pressable key={item.barID}
+                                               onPress={() => {
+                                                   setIsOpen(true);
+                                                   setClickedID(item.barID);
+                                               }}
+                                               style={{paddingHorizontal: 18}}>
+                                        <View style={{
+                                            width: 180,
+                                            height: 130,
+                                            backgroundColor: colors.darkGrey4,
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        }}>
+                                            <Image style={{width: 180, height: 130, borderRadius: 10}}
+                                                   source={{uri: barPath(item.barID - 432)}}/>
+                    
+                                        </View>
+                                        <View style={{flexDirection: "row", marginTop: 7, alignItems: 'center',}}>
+                                            <Text style={{color: colors.darkGrey, fontSize: 12, fontWeight: 500, width: 170}}>{item.barName}</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', alignItems: 'center', marginTop:5}}>
+                                            <Image source={star}/>
+                                            <Text style={{marginLeft: 3, marginRight: 5, fontSize: 10}}>{item.averageStar ? item.averageStar.toFixed(1) : 0}</Text>
+                                            <Text style={{color: colors.mainOrange, fontSize: 10, fontWeight: "500"}}>{`RANK ${i+1}`}</Text>
+                                        </View>
+                                    </Pressable>
+                                )
+                            }
                         </ScrollView>
                     </View>
                     
@@ -179,16 +211,44 @@ export default function MainPage() {
                     <View style={{
                         position: "absolute",
                         top: 560,
-                        width: windowWidth,
+                        width: windowWidth.width,
                         height: 0.5,
                         backgroundColor: "black",
                         opacity: 0.1
                     }}/>
+                    <View style={{
+                        position: "absolute",
+                        top: 860,
+                        width: windowWidth.width,
+                        height: 0.5,
+                        backgroundColor: "black",
+                        opacity: 0.1
+                    }}/>
+    
+                    {
+                        <Modal isVisible={isOpen} onBackdropPress={()=> {
+                            setIsOpen(false);
+                            setClickedID(null);
+                        }}>
+                            <SafeAreaView style={{...styles.modalContainer, width: windowWidth.width + 36, height: windowWidth.height - 150}}>
+                                <View style={{width: "100%", height: 30, justifyContent: "center", alignItems: "center"}}
+                                      onMoveShouldSetResponder={(evt) => true}
+                                      onResponderRelease={(evt) => {
+                                          if (evt.nativeEvent.pageY > windowWidth.height / 3) setIsOpen(false)
+                                      }}
+                                >
+                                    <Pressable style={{width: "100%", height: 20, justifyContent: "center", alignItems: "center"}}>
+                                        <View style={{width: 50, height: 3, backgroundColor: 'rgba(0, 0, 0, 0.3)', borderRadius: 10}}/>
+                                    </Pressable>
+                                </View>
+                                <BarInfoTemplate clickedCenterId={clickedID}/>
+                            </SafeAreaView>
+                        </Modal>
+                    }
                 
                 </SafeAreaView>
             </ScrollView>
-            <ReservationModal open={isModalOpen} setOpen={setIsModalOpen} width={windowWidth}
-                              setReserved={setIsReserved} status={status} setStatus={setStatus}/>
+            
         </>
     )
 }
@@ -198,5 +258,15 @@ const styles = StyleSheet.create({
         // flex: 1,
         backgroundColor: 'white',
         alignItems: 'center',
+    },
+    modalContainer: {
+        // width: Layout.window.width,
+        // height: Layout.window.height - 150,
+        paddingHorizontal: 18,
+        marginTop: 200, marginBottom: 50,
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        backgroundColor: 'rgba(255,255,255, 1)',
+        alignSelf: "center"
     }
 })

@@ -6,6 +6,7 @@ import RecommendationDetailPage from "../screens/RecommendationPage/Recommendati
 import BookmarkBar from "../screens/MyPage/pages/BookmarkBar";
 import MyLiquorReview from "../screens/MyPage/pages/MyLiquorReview";
 import MyBarReview from "../screens/MyPage/pages/MyBarReview";
+import ManagePage from "../screens/MyPage/pages/ManagePage";
 
 export default function MyPageStack(){
     const Stack = createNativeStackNavigator();
@@ -46,6 +47,10 @@ export default function MyPageStack(){
             <Stack.Screen
                 name="BookmarkBar"
                 component={BookmarkBar}
+            />
+            <Stack.Screen
+                name="Manage"
+                component={ManagePage}
             />
             
         </Stack.Navigator>

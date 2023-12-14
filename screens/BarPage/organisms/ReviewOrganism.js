@@ -6,13 +6,12 @@ import star from "../../../assets/img/reviewStar.png"
 
 export default function ReviewOrganism({info}) {
     
-    console.log(info.barReview)
     return (
         <View>
             <View style={{alignItems: "center", marginTop: 23, marginBottom: 20}}>
-                <Text style={styles.starText}>{info.barStarAverage ? info.barStarAverage : 0}</Text>
+                <Text style={styles.starText}>{info.barStarAverage ? info.barStarAverage.toFixed(1) : 0}</Text>
                 <Rating type={"custom"}
-                        ratingColor="#FFC008"
+                        ratingColor={colors.mainOrange}
                         imageSize={24}
                         readonly={true}
                         fractions={1}
@@ -43,7 +42,7 @@ export default function ReviewOrganism({info}) {
                             }}>{item.barReviewDetail}</Text>
                             <View style={{flexDirection: "row", alignItems: "center"}}>
                                 <Image source={star}/>
-                                <Text style={styles.starText}>{item.barStar}</Text>
+                                <Text style={styles.starText}>{item.barStar.toFixed(1)}</Text>
                             </View>
                         </View>
                     
@@ -58,7 +57,7 @@ export default function ReviewOrganism({info}) {
 
 const styles = StyleSheet.create({
     starText: {
-        color: "#FFC008",
+        color: colors.mainOrange,
         fontSize: 18,
         fontWeight: "700"
     },

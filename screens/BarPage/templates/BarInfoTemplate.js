@@ -13,6 +13,7 @@ import axios from "axios";
 import {UserInfo} from "../../../components/recoil/LoginStore";
 import {useRecoilValue} from "recoil";
 import {useFocusEffect} from "@react-navigation/native";
+import {barPath} from "../../../components/common/style/photo";
 
 
 export default function BarInfoTemplate({clickedCenterId}) {
@@ -28,7 +29,9 @@ export default function BarInfoTemplate({clickedCenterId}) {
     const userInfo = useRecoilValue(UserInfo);
     
     useEffect(()=>{
-        axios.get(`http://localhost:8080/bar/info/${clickedCenterId}`)
+        if(!clickedCenterId) return;
+        
+        axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/info/${clickedCenterId}`)
         .then(res => setCenterInfo(res.data[0]))
     },[flag, clickedCenterId])
     
@@ -51,19 +54,19 @@ export default function BarInfoTemplate({clickedCenterId}) {
     });
     
     const onClickLike = async () => {
-        await axios.post(`http://localhost:8080/bar/bookmark/${clickedCenterId}`, {userID: userInfo.userID});
+        await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/bar/bookmark/${clickedCenterId}`, {userID: userInfo.userID});
         if (bookmarkList.includes(clickedCenterId)) {
             Alert.alert("찜목에서 제거되었습니다.")
         } else {
             Alert.alert("찜목록에 추가되었습니다.")
         }
-        await axios.get(`http://localhost:8080/bar/bookmark/${userInfo.userID}`)
+        await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/bookmark/${userInfo.userID}`)
         .then(res => setBookmarkList(res.data.bookmarkList));
     }
     
     useFocusEffect(
         useCallback(() => {
-            axios.get(`http://localhost:8080/bar/bookmark/${userInfo.userID}`)
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/bookmark/${userInfo.userID}`)
             .then(res => setBookmarkList(res.data.bookmarkList));
         }, []));
     
@@ -95,7 +98,7 @@ export default function BarInfoTemplate({clickedCenterId}) {
                 <>
                     <View style={{alignItems: "center"}}>
                         <Image
-                            source={barBanner}
+                            source={{uri: barPath(centerInfo.barID - 432)}}
                             style={{
                                 width: "100%",
                                 height: 160,

@@ -7,31 +7,38 @@ import {
     Image,
     SafeAreaView,
     ScrollView, Pressable, StyleSheet,
-    ActivityIndicator, Alert
+    ActivityIndicator, Alert, useWindowDimensions
 } from "react-native"
 import {useState, useEffect, useCallback} from "react";
 import {colors} from "../../components/common/style/colors";
 import searchImg from "../../assets/img/searchImg.png"
 import axios from "axios"
-import whiskeyBanner from "../../assets/img/whiskeyBanner.png";
-import downArrow from "../../assets/img/filterDownArrow.png";
+import whiskeyBanner from "../../assets/img/johnnie.jpeg";
 import star from "../../assets/img/ratingStar.png";
-import reviewImg from "../../assets/img/reviewImg.png";
 import {useFocusEffect} from "@react-navigation/native";
+import {useRecoilValue} from "recoil";
+import {UserInfo} from "../../components/recoil/LoginStore";
+import heart from "../../assets/img/redHeart.png"
+import voidHeart from "../../assets/img/brokenHeart.png"
 
+import {liquorPath} from "../../components/common/style/photo";
 
 export default function RecommendationPage({navigation}) {
     const [liquorList, setLiquorList] = useState(null);
     const [searchText, setSearchText] = useState("");
     const [loading, setLoading] = useState(false);
+    const [bookmarkList, setBookmarkList] = useState([]);
+    const userInfo = useRecoilValue(UserInfo);
+    const windowWidth = useWindowDimensions();
+    
     
     const handleSearch = async () => {
         
         try {
             if (searchText === "") {
-                axios.get("http://localhost:8080/liquor/info").then(res => setLiquorList(res.data));
+                axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/info`).then(res => setLiquorList(res.data));
             } else {
-                await axios.get(`http://localhost:8080/liquor/search/${searchText}`)
+                await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/search/${searchText}`)
                 .then(res => setLiquorList(res.data));
             }
             
@@ -47,9 +54,12 @@ export default function RecommendationPage({navigation}) {
     
     useFocusEffect(
         useCallback(() => {
-            axios.get("http://localhost:8080/liquor/info").then(res => setLiquorList(res.data))
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/info`).then(res => setLiquorList(res.data));
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/bookmark/${userInfo.userID}`)
+            .then(res => setBookmarkList(res.data));
         }, []));
     
+    console.log(bookmarkList)
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <SafeAreaView style={{display: "flex", flex: 1, backgroundColor: "white"}}>
@@ -81,9 +91,9 @@ export default function RecommendationPage({navigation}) {
                 </View>
                 <ScrollView style={{flex: 1}}>
                     <Pressable>
-                        <View>
-                            <Image style={{width: "100%"}} source={whiskeyBanner}/>
-                        </View>
+                        <Pressable style={{alignItems: "center"}} onPress={()=>navigation.navigate("RecommendationDetail",{id: 1})}>
+                            <Image style={{width: windowWidth.width + 10, height: 300}} source={whiskeyBanner}/>
+                        </Pressable>
                         
                         {/*<View style={{flexDirection: "row", marginTop: 25, marginHorizontal: 18}}>*/}
                         {/*    <View style={styles.filterStyle}>*/}
@@ -116,16 +126,7 @@ export default function RecommendationPage({navigation}) {
                                 fontWeight: "500"
                             }}>총 {liquorList && liquorList.length} 개</Text>
                             
-                            <View style={{flexDirection: "row", alignItems: "center", marginLeft: "auto"}}>
-                                <Text
-                                    style={{
-                                        marginRight: 3,
-                                        color: colors.darkGrey,
-                                        fontSize: 12,
-                                        fontWeight: "500"
-                                    }}>전체</Text>
-                                <Image source={downArrow}/>
-                            </View>
+                            
                         
                         </View>
                         
@@ -150,13 +151,26 @@ export default function RecommendationPage({navigation}) {
                                                            style={{paddingBottom: 15, flexWrap: "wrap"}}
                                                            onPress={() => navigation.navigate("RecommendationDetail", {id: item.liquorID})}
                                                 >
-                                                    <View style={{
-                                                        width: 160,
-                                                        height: 150,
-                                                        marginBottom: 10,
-                                                        backgroundColor: "black"
-                                                    }}
-                                                    />
+                                                    <View>
+                                                        <View style={{
+                                                            width: 160,
+                                                            height: 150,
+                                                            marginBottom: 10,
+                                                            backgroundColor: colors.darkGrey4,
+                                                            alignItems: "center",
+                                                            justifyContent: "center"
+                                                        }}
+                                                        >
+                                                            <Image style={{width:80 ,height: 120}} source={{uri: liquorPath(item.liquorID)}} />
+                                                        </View>
+                                                        {
+                                                            bookmarkList.includes(item.liquorID) ?
+                                                                <Image style={{position: "absolute", right:10, top:10}} source={heart} />
+                                                                :
+                                                                <Image style={{position: "absolute", right:10, top:10}} source={voidHeart} />
+                                                        }
+                                                    </View>
+                                                    
                                                     <Text style={{
                                                         color: colors.darkGrey,
                                                         fontWeight: "700",
@@ -168,7 +182,7 @@ export default function RecommendationPage({navigation}) {
                                                     <Text style={{
                                                         color: colors.darkGrey,
                                                         fontSize: 12
-                                                    }}>${item.liquorPrice}</Text>
+                                                    }}>$ {item.liquorPrice}</Text>
                                                     <View style={{flexDirection: "row", marginTop: 3}}>
                                                         <Image source={star}/>
                                                         <Text style={{
@@ -176,14 +190,14 @@ export default function RecommendationPage({navigation}) {
                                                             fontSize: 10,
                                                             fontWeight: "500",
                                                             marginLeft: 2
-                                                        }}>{item.averageLiquorStar ? item.averageLiquorStar.toFixed(1) : 0}</Text>
-                                                        <Image source={reviewImg}/>
-                                                        <Text
-                                                            style={{
-                                                                fontSize: 10,
-                                                                fontWeight: "500",
-                                                                marginLeft: 3
-                                                            }}>123</Text>
+                                                        }}>{item.liquorAvgStar ? item.liquorAvgStar.toFixed(1) : 0}</Text>
+                                                        {/*<Image source={reviewImg}/>*/}
+                                                        {/*<Text*/}
+                                                        {/*    style={{*/}
+                                                        {/*        fontSize: 10,*/}
+                                                        {/*        fontWeight: "500",*/}
+                                                        {/*        marginLeft: 3*/}
+                                                        {/*    }}>{bookmarkList.includes(item.liquorID) && "찜"}</Text>*/}
                                                     </View>
                                                 </Pressable>
                                             ))

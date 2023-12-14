@@ -8,26 +8,27 @@ import {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 import {useFocusEffect} from "@react-navigation/native";
 import star from "../../../assets/img/ratingStar.png"
+import {barPath} from "../../../components/common/style/photo";
 
 export default function BarListTemplate({mapList, setClickedCenterId, setCenterOfMap}) {
     const userInfo = useRecoilValue(UserInfo);
     const [bookmarkList, setBookmarkList] = useState([]);
     
     const onClickLike = async (id) => {
-        await axios.post(`http://localhost:8080/bar/bookmark/${id}`,{userID: userInfo.userID});
+        await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/bar/bookmark/${id}`,{userID: userInfo.userID});
         if(bookmarkList.includes(id)){
             Alert.alert("찜목에서 취소되었습니다.")
         }
         else{
             Alert.alert("찜목록에 추가되었습니다.")
         }
-        await axios.get(`http://localhost:8080/bar/bookmark/${userInfo.userID}`)
+        await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/bookmark/${userInfo.userID}`)
         .then(res => setBookmarkList(res.data.bookmarkList));
     }
     
     useFocusEffect(
         useCallback(()=>{
-        axios.get(`http://localhost:8080/bar/bookmark/${userInfo.userID}`)
+        axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bar/bookmark/${userInfo.userID}`)
             .then(res => setBookmarkList(res.data.bookmarkList));
     },[]));
     
@@ -63,7 +64,7 @@ export default function BarListTemplate({mapList, setClickedCenterId, setCenterO
                                 height: 72,
                                 borderRadius: 10
                             }}
-                                   source={barBanner}/>
+                                   source={{uri: barPath(item.barID - 432)}}/>
                             <View style={{
                                 paddingLeft: 12,
                                 justifyContent: "center"

@@ -58,7 +58,7 @@ export default function SignupPage({navigation}) {
                 Alert.alert("아이디는 최소 5자 이상이여야합니다.");
                 return;
             }
-            await axios.get(`http://localhost:8080/signup/loginID/${inputID}`)  //api호출
+            await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/signup/loginID/${inputID}`)  //api호출
             .then(() => {
                 Alert.alert('사용 가능한 아이디입니다.')
                 setCheck({...check, id: true}); //아이디중복 확인을 했다는 표시
@@ -85,7 +85,7 @@ export default function SignupPage({navigation}) {
             Alert.alert('닉네님은 2~10자로 입력해주세요.')
         }
         else {
-            await axios.get(`http://localhost:8080/signup/userNickname/${inputNickname}`)   //api호출
+            await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/signup/userNickname/${inputNickname}`)   //api호출
             .then((res) => {
                 Alert.alert('사용 가능한 닉네임입니다.')
                 setCheck({...check, nickname: true});   //nickname중복 확인 표시
@@ -112,7 +112,7 @@ export default function SignupPage({navigation}) {
             Alert.alert('이메일을 정확하게 기입해주세요')
         }
         else {
-            await axios.get(`http://localhost:8080/signup/userNickname/${inputEmail}`)   //api호출
+            await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/signup/userNickname/${inputEmail}`)   //api호출
             .then((res) => {
                 Alert.alert('사용 가능한 닉네임입니다.')
                 setCheck({...check, email: true});   //email중복 확인 표시
@@ -148,12 +148,12 @@ export default function SignupPage({navigation}) {
                         onPress: async () => {
                             try {
                                 pwErrCheck();
-                                await axios.post(`http://localhost:8080/signup`, {
+                                await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/signup`, {
                                     loginID: info.id,
                                     loginPW: info.pw,
                                     userNickname: info.nickname,
                                     userName: info.name,
-                                    userEmail: info.userEmail,
+                                    userEmail: info.email,
                                     deviceID: await AsyncStorage.getItem("deviceId")
                                 })
                                 .then(()=> {

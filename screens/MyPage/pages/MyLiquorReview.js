@@ -51,7 +51,7 @@ export default function MyLiquorReview({navigation, route}){
                             <Text style={{color: colors.darkGrey, fontSize:16, fontWeight: "500"}}>{item.liquorReviewDetail}</Text>
                             <View style={{flexDirection: "row", alignItems: "center"}}>
                                 <Image source={star} />
-                                <Text style={styles.starText}>{item.liquorStar}</Text>
+                                <Text style={styles.starText}>{item.liquorStar.toFixed(1)}</Text>
                             </View>
                         </View>
                 
@@ -67,7 +67,7 @@ export default function MyLiquorReview({navigation, route}){
 
 const styles = StyleSheet.create({
     starText: {
-        color: "#FFC008",
+        color: colors.mainOrange,
         fontSize: 18,
         fontWeight: "700"
     },

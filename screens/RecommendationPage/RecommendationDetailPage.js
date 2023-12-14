@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import {useCallback, useEffect, useState} from "react";
 import backBtn from "../../assets/img/backBtn.png";
-import whiskeyDetail1 from "../../assets/img/whiskeyDetail1.png";
 import likeBtn from "../../assets/img/heart.png";
 import {colors} from "../../components/common/style/colors";
 import axios from "axios";
@@ -20,6 +19,8 @@ import {useRecoilValue} from "recoil";
 import {useFocusEffect} from "@react-navigation/native";
 import {Rating} from "react-native-ratings";
 import star from "../../assets/img/reviewStar.png";
+import {liquorPath} from "../../components/common/style/photo";
+
 
 
 export default function RecommendationDetailPage({navigation, route}) {
@@ -29,10 +30,10 @@ export default function RecommendationDetailPage({navigation, route}) {
     const userInfo = useRecoilValue(UserInfo);
     
     const onClickHeart = async () => {
-        await axios.post(`http://localhost:8080/liquor/bookmark/${route.params.id}`, {
+        await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/liquor/bookmark/${route.params.id}`, {
             userID: userInfo.userID
         })
-        axios.get(`http://localhost:8080/liquor/bookmark/${userInfo.userID}`).then(res => {
+        axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/bookmark/${userInfo.userID}`).then(res => {
                 if (res.data.includes(route.params.id)) {
                     setIsLiked(true);
                     Alert.alert("찜목록에 추가되었습니다.")
@@ -43,15 +44,16 @@ export default function RecommendationDetailPage({navigation, route}) {
             }
         );
     }
-    console.log(userInfo);
     useEffect(() => {
         navigation.setOptions({
             headerLeft: () =>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Pressable style={{width: 23, marginLeft: -8, marginRight: 15}}
+                    <Pressable style={{width: 23, marginRight: 7}}
                                onPress={() => navigation.goBack()}>
                         <Image source={backBtn}/>
                     </Pressable>
+                    <Text style={{fontSize: 18, fontWeight: '700', color: '#474348'}}>상세 보기</Text>
+
                 </View>,
             headerTitle: () => <></>,
             headerBackVisible: false,
@@ -60,16 +62,16 @@ export default function RecommendationDetailPage({navigation, route}) {
     
     useFocusEffect(
         useCallback(() => {
-            axios.get(`http://localhost:8080/liquor/info/${route.params.id}`).then(res =>
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/info/${route.params.id}`).then(res =>
                 setLiquorInfo(res.data[0])
             );
-            axios.get(`http://localhost:8080/liquor/bookmark/${userInfo.userID}`).then(res =>
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/bookmark/${userInfo.userID}`).then(res =>
                 res.data.includes(route.params.id) ?
                     setIsLiked(true)
                     :
                     setIsLiked(false)
             );
-        }, []));
+        }, [route.params.id]));
     
     
     return (
@@ -84,7 +86,7 @@ export default function RecommendationDetailPage({navigation, route}) {
                             justifyContent: 'center',
                             backgroundColor: 'rgb(247,246,247)'
                         }}>
-                            <Image source={whiskeyDetail1}/>
+                            <Image style={{width: 180, height: 240}} source={{uri: liquorPath(route.params.id)}}/>
                         </View>
                         <View style={{width: windowWidth, alignSelf: 'center'}}>
                             <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
@@ -92,7 +94,7 @@ export default function RecommendationDetailPage({navigation, route}) {
                                     <Text style={{opacity: 0.5, fontSize: 17, fontWeight: 400}}>
                                         {liquorInfo.liquorType}
                                     </Text>
-                                    <Text style={{fontSize: 18, color: colors.darkGrey, width: "80%"}}>
+                                    <Text style={{fontSize: 18, color: colors.darkGrey, width: 300}}>
                                         {liquorInfo.liquorName}
                                     </Text>
                                 </View>
@@ -152,13 +154,13 @@ export default function RecommendationDetailPage({navigation, route}) {
                             <View style={{alignItems: "center", marginTop: 23, marginBottom: 20}}>
                                 <Text style={styles.starText}>{liquorInfo.averageLiquorStar ? liquorInfo.averageLiquorStar.toFixed(1) : 0}</Text>
                                 <Rating type="custom"
-                                        ratingColor={"#FFC008"}
+                                        ratingColor={colors.mainOrange}
                                         imageSize={24}
                                         readonly={true}
                                         fractions={1}
                                         startingValue={liquorInfo.averageLiquorStar}
                                 />
-                                <Text style={{color: "#888", fontSize: 12, marginTop: 10}}>1개의 리뷰</Text>
+                                <Text style={{color: "#888", fontSize: 12, marginTop: 10}}>{liquorInfo.liquorReview.length}개의 리뷰</Text>
                             </View>
                             
                             <View style={{width: "100%", height: 5, backgroundColor: "#F8F8F8"}}/>
@@ -240,7 +242,7 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     starText: {
-        color: "#FFC008",
+        color: colors.mainOrange,
         fontSize: 18,
         fontWeight: "700"
     },

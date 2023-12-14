@@ -8,7 +8,7 @@ export default function BarInfoOrganism({info}){
             <StyledRow title={"가게명"} content={info.barName}/>
             <StyledRow title={"주소"} content={info.barAddress}/>
             <StyledRow title={"가게 유형"} content={info.barType}/>
-            <StyledRow title={"콜키지 비용"} content={info.barType}/>
+            <StyledRow title={"콜키지 비용"} content={typeof info.barCorkPrice === 'number' ? `${info.barCorkPrice} 원` : "지원안함"}/>
             
             <StyledRow2 title={"영업 시간"} start={info.barStartTime} end={info.barEndTime}/>
             

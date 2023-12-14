@@ -16,7 +16,7 @@ export default function MyBarReview({navigation, route}){
                                onPress={() => navigation.goBack()}>
                         <Image source={backBtn}/>
                     </Pressable>
-                    <Text style={{fontSize: 18, fontWeight: '700', color: '#474348'}}>찜한 주류</Text>
+                    <Text style={{fontSize: 18, fontWeight: '700', color: '#474348'}}>가게 리뷰</Text>
                 </View>,
             headerTitle: () => <></>,
             headerBackVisible: false,
@@ -47,7 +47,7 @@ export default function MyBarReview({navigation, route}){
                                 <Text style={{color: colors.darkGrey, fontSize:16, fontWeight: "500"}}>{item.barReviewDetail}</Text>
                                 <View style={{flexDirection: "row", alignItems: "center"}}>
                                     <Image source={star} />
-                                    <Text style={styles.starText}>{item.barStar}</Text>
+                                    <Text style={styles.starText}>{item.barStar.toFixed(1)}</Text>
                                 </View>
                             </View>
                             
@@ -63,7 +63,7 @@ export default function MyBarReview({navigation, route}){
 
 const styles = StyleSheet.create({
     starText: {
-        color: "#FFC008",
+        color: colors.mainOrange,
         fontSize: 18,
         fontWeight: "700"
     },

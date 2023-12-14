@@ -11,7 +11,7 @@ import {
     useWindowDimensions,
     TextInput
 } from 'react-native';
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import backBtn from "../../../assets/img/backBtn.png";
 import {colors} from "../../../components/common/style/colors";
 import {UserInfo} from "../../../components/recoil/LoginStore";
@@ -21,6 +21,8 @@ import closeBtn from "../../../assets/img/closeBtn.png"
 import star from "../../../assets/img/ratingStar.png"
 import Modal from "react-native-modal";
 import {Rating} from "react-native-ratings";
+import {useFocusEffect} from "@react-navigation/native";
+import {liquorPath} from "../../../components/common/style/photo";
 
 
 export default function BookmarkWhiskey({navigation}) {
@@ -32,6 +34,9 @@ export default function BookmarkWhiskey({navigation}) {
     const [clickedID, setClickedID] = useState(null);
     const [reviewText, setReviewText] = useState("");
     const [reviewStar, setReviewStar] = useState(null);
+    const [loading, setLoading] = useState(true)
+    
+    
     const onPressClose = (liquorId) => {
         Alert.alert(
             "목록에서 삭제하시겠습니까?",
@@ -44,9 +49,11 @@ export default function BookmarkWhiskey({navigation}) {
                 {
                     text: "삭제",
                     onPress: async () => {
-                        await axios.post(`http://localhost:8080/liquor/bookmark/${liquorId}`, {userID: userInfo.userID});
-                        await axios.get(`http://localhost:8080/liquor/bookmark/${userInfo.userID}`).then(res => setBookmarkList(res.data));
+                        await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/liquor/bookmark/${liquorId}`, {userID: userInfo.userID});
+                        await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/bookmark/${userInfo.userID}`).then(res => setBookmarkList(res.data));
                         setInfos([]);
+                        setLoading(true);
+                        setTimeout(()=>{setLoading(false)}, 500)
                     }
                 }
             ]
@@ -61,7 +68,7 @@ export default function BookmarkWhiskey({navigation}) {
         }
         
         try {
-            await axios.post(`http://localhost:8080/liquor/review/${clickedID}`, {
+            await axios.post(`${process.env.REACT_APP_IP_ADDRESS}/liquor/review/${clickedID}`, {
                 userNickname: userInfo.userNickname,
                 liquorStar: reviewStar,
                 liquorReviewDetail: reviewText
@@ -75,14 +82,19 @@ export default function BookmarkWhiskey({navigation}) {
         }
     }
     
-    useEffect(() => {
-        axios.get(`http://localhost:8080/liquor/bookmark/${userInfo.userID}`).then(res => setBookmarkList(res.data));
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/bookmark/${userInfo.userID}`).then(res => {
+                setBookmarkList(res.data);
+                setInfos([]);
+                setLoading(false);
+            });
+        }, []));
     
     useEffect(() => {
         if (!bookmarkList) return;
         
-        bookmarkList.forEach(item => axios.get(`http://localhost:8080/liquor/info/${item}`)
+        bookmarkList.forEach(item => axios.get(`${process.env.REACT_APP_IP_ADDRESS}/liquor/info/${item}`)
         .then(res => setInfos(cur => [...cur, res.data[0]])));
     }, [bookmarkList])
     
@@ -92,7 +104,7 @@ export default function BookmarkWhiskey({navigation}) {
             headerLeft: () =>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <Pressable style={{width: 23, marginRight: 7}}
-                               onPress={() => navigation.goBack()}>
+                               onPress={() => navigation.navigate("MyPage")}>
                         <Image source={backBtn}/>
                     </Pressable>
                     <Text style={{fontSize: 18, fontWeight: '700', color: '#474348'}}>찜한 주류</Text>
@@ -108,6 +120,8 @@ export default function BookmarkWhiskey({navigation}) {
             <View style={{flex: 1}}>
                 <View style={{backgroundColor: colors.darkGrey20, height: 1}}/>
                 {
+                    loading ? <ActivityIndicator style={{marginTop: 300}}/>
+                        :
                     infos.length === 0 ?
                         <Text style={{alignSelf: "center", marginTop: 300}}>찜한 주류가 없습니다.</Text>
                         :
@@ -122,13 +136,16 @@ export default function BookmarkWhiskey({navigation}) {
                                        }}
                                        onPress={() => navigation.navigate("WhiskeyDetail", {id: item.liquorID})}
                             >
-                                <View style={{width: 80, height: 100, backgroundColor: "red", borderRadius: 10}}/>
+                                <View style={{width: 80, height: 100, backgroundColor: colors.darkGrey4, borderRadius: 10, alignItems: "center", justifyContent: "center"}}
+                                >
+                                    <Image source={{uri: liquorPath(item.liquorID)}} style={{width: 50, height: 80}}/>
+                                </View>
                                 <View style={{paddingVertical: 5, marginLeft: 10}}>
                                     <Text style={styles.title}>{item.liquorName}</Text>
                                     <Text style={styles.price}>$ {item.liquorPrice}</Text>
                                     <View style={{ flexDirection: "row", alignItems: "center"}}>
                                         <Image source={star}/>
-                                        <Text style={{marginLeft:3}}>{item.averageLiquorStar ? item.averageLiquorStar : 0}</Text>
+                                        <Text style={{marginLeft:3}}>{item.averageLiquorStar ? item.averageLiquorStar.toFixed(1) : 0}</Text>
                                     </View>
                                     <Pressable onPress={() => {
                                         setClickedID(item.liquorID);
